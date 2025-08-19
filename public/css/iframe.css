@@ -1,0 +1,329 @@
+/* Iframe-specific CSS for HighLevel Integration
+   Optimized styling for embedded application within HighLevel
+   ©2025 AcquisitionPRO® - All Rights Reserved */
+
+/* Import main styles */
+@import url('./main.css');
+
+/* Override base styles for iframe context */
+body.iframe-mode {
+  margin: 0;
+  padding: 0;
+  background: var(--white);
+  min-height: auto;
+  overflow-x: hidden;
+}
+
+/* Compact Header for Iframe */
+.iframe-header {
+  background: var(--bg-brand-gradient);
+  color: var(--white);
+  padding: var(--spacing-md) var(--spacing-lg);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.iframe-header h1 {
+  font-size: var(--font-size-lg);
+  color: var(--white);
+  margin: 0;
+  font-weight: 500;
+}
+
+.iframe-header .logo {
+  height: 32px;
+  width: auto;
+  vertical-align: middle;
+  margin-right: var(--spacing-sm);
+}
+
+/* Minimal Navigation for Iframe */
+.iframe-nav {
+  display: flex;
+  justify-content: center;
+  background: var(--gray-50);
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.iframe-nav-button {
+  background: none;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin: 0 var(--spacing-xs);
+  color: var(--gray-600);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.iframe-nav-button:hover {
+  background: var(--gray-100);
+  color: var(--primary-navy);
+}
+
+.iframe-nav-button.active {
+  background: var(--secondary-blue);
+  color: var(--white);
+}
+
+/* Compact Container for Iframe */
+.iframe-container {
+  padding: var(--spacing-md);
+  max-width: none;
+  margin: 0;
+}
+
+/* Adjust Cards for Iframe */
+.iframe-mode .card {
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.iframe-mode .card-title {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Compact Forms for Iframe */
+.iframe-mode .form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.iframe-mode .form-input {
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+/* Smaller Buttons in Iframe */
+.iframe-mode .btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  min-width: 100px;
+}
+
+.iframe-mode .btn-large {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: var(--font-size-base);
+  min-width: 140px;
+}
+
+/* Calculator Layout for Iframe */
+.iframe-calculator {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.iframe-calculator .input-panel,
+.iframe-calculator .results-panel {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+.iframe-calculator .panel-title {
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--gray-200);
+  color: var(--primary-navy);
+}
+
+/* Activity Tracker for Iframe */
+.iframe-tracker {
+  margin-top: var(--spacing-md);
+}
+
+.iframe-tracker .metric-card {
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.iframe-tracker .metric-title {
+  font-size: var(--font-size-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.iframe-tracker .metric-value {
+  font-size: var(--font-size-xl);
+}
+
+.iframe-tracker .dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+/* Tab System for Iframe */
+.iframe-tabs {
+  display: flex;
+  background: var(--gray-100);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  overflow: hidden;
+}
+
+.iframe-tab-button {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.iframe-tab-button:hover {
+  background: var(--gray-200);
+  color: var(--primary-navy);
+}
+
+.iframe-tab-button.active {
+  background: var(--white);
+  color: var(--secondary-blue);
+  border-bottom-color: var(--secondary-blue);
+}
+
+.iframe-tab-content {
+  display: none;
+  background: var(--white);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  border: 1px solid var(--gray-200);
+  border-top: none;
+  padding: var(--spacing-lg);
+}
+
+.iframe-tab-content.active {
+  display: block;
+}
+
+/* Results Display for Iframe */
+.iframe-result-item {
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  border-left: 3px solid var(--secondary-blue);
+}
+
+.iframe-result-item.highlight {
+  background: var(--secondary-blue);
+  color: var(--white);
+  border-left-color: var(--primary-navy);
+}
+
+.iframe-result-label {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.iframe-result-value {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+/* Minimal Footer for Iframe */
+.iframe-footer {
+  background: var(--gray-100);
+  padding: var(--spacing-sm);
+  text-align: center;
+  border-top: 1px solid var(--gray-200);
+  margin-top: var(--spacing-lg);
+}
+
+.iframe-footer .copyright {
+  font-size: var(--font-size-xs);
+  color: var(--gray-500);
+  margin: 0;
+}
+
+/* Progress Bars for Iframe */
+.iframe-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--gray-200);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: var(--spacing-xs) 0;
+}
+
+.iframe-progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+.iframe-progress-fill.good {
+  background: var(--success);
+}
+
+.iframe-progress-fill.warning {
+  background: var(--warning);
+}
+
+.iframe-progress-fill.danger {
+  background: var(--error);
+}
+
+/* Responsive Adjustments for Iframe */
+@media (max-width: 768px) {
+  .iframe-calculator {
+    grid-template-columns: 1fr;
+  }
+  
+  .iframe-tracker .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .iframe-container {
+    padding: var(--spacing-sm);
+  }
+}
+
+/* Hide elements not needed in iframe */
+.iframe-mode .standalone-only {
+  display: none !important;
+}
+
+/* Utility classes for iframe mode */
+.iframe-mode .compact-spacing {
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+.iframe-mode .compact-padding {
+  padding: var(--spacing-sm) !important;
+}
+
+.iframe-mode .text-compact {
+  font-size: var(--font-size-sm) !important;
+  line-height: 1.4 !important;
+}
+
+/* Animation for smooth transitions */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.iframe-mode .animate-in {
+  animation: slideIn 0.3s ease-out;
+}

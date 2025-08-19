@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Know Your Numbers - Investors</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .results-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .panel-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8f0fe;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e8f0fe;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .highlight-result {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border-left: 4px solid #2c3e50;
+        }
+
+        .highlight-result .result-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .highlight-result .result-value {
+            color: white;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e8f0fe;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #3498db;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Know Your Numbers - Investors</h1>
+            <p>The #1 CRE Investor's Goal Setting Application</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-panel">
+                <div class="panel-title">Input Your Goals & Ratios</div>
+                
+                <div class="form-section">
+                    <div class="section-title">Acquisition Fee Goals</div>
+                    <div class="form-group">
+                        <label for="netAcquisitionFee">Net Acquisition Fee Goal ($)</label>
+                        <input type="number" id="netAcquisitionFee" value="250000" step="1000">
+                    </div>
+                    <div class="form-group">
+                        <label for="reinvestmentPercentage">Reinvestment Percentage (Must be > 0) (%)</label>
+                        <input type="number" id="reinvestmentPercentage" value="20" step="0.1" min="0.1" max="99">
+                    </div>
+                    <div class="form-group">
+                        <label for="avgSalePrice">Average Sale Price ($)</label>
+                        <input type="number" id="avgSalePrice" value="3000000" step="10000">
+                    </div>
+                    <div class="form-group">
+                        <label for="avgAcquisitionFee">Average Acquisition Fee (%)</label>
+                        <input type="number" id="avgAcquisitionFee" value="3" step="0.1" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Performance Ratios</div>
+                    <div class="form-group">
+                        <label for="closingRatio">Contract to Closing Ratio (%)</label>
+                        <input type="number" id="closingRatio" value="75" step="1" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="opportunityRatio">Opportunity Found to Contract Ratio (%)</label>
+                        <input type="number" id="opportunityRatio" value="75" step="1" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="appointmentRatio">1st Appt W/Owner to Opportunity Ratio (%)</label>
+                        <input type="number" id="appointmentRatio" value="10" step="1" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="contactRatio">Contact to 1st Appointment Ratio (%)</label>
+                        <input type="number" id="contactRatio" value="10" step="1" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="attemptRatio">Attempts to Contact Ratio (%)</label>
+                        <input type="number" id="attemptRatio" value="20" step="1" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Time Planning</div>
+                    <div class="form-group">
+                        <label for="vacationDays">Vacation Days Planned</label>
+                        <input type="number" id="vacationDays" value="10" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="sickDays">Sick Days Projected</label>
+                        <input type="number" id="sickDays" value="5" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="conferenceDays">Conference Days Planned</label>
+                        <input type="number" id="conferenceDays" value="10" step="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="trainingDays">Training Days Planned</label>
+                        <input type="number" id="trainingDays" value="10" step="1" min="0">
+                    </div>
+                </div>
+
+                <button class="btn" onclick="calculateNumbers()">Calculate Your Numbers</button>
+            </div>
+
+            <div class="results-panel">
+                <div class="panel-title">Your Required Numbers</div>
+                
+                <div class="result-item highlight-result">
+                    <div class="result-label">Gross Acquisition Fee Goal</div>
+                    <div class="result-value" id="grossAcquisitionFee">$312,500</div>
+                </div>
+
+                <div class="result-item highlight-result">
+                    <div class="result-label">Total Weeks Worked in Year</div>
+                    <div class="result-value" id="weeksWorked">45</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Total Closings Needed</div>
+                    <div class="result-value" id="closingsNeeded">3</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Total Contracts Needed</div>
+                    <div class="result-value" id="contractsNeeded">5</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Total Opportunities Needed</div>
+                    <div class="result-value" id="opportunitiesNeeded">6</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Total 1st Appointments Needed</div>
+                    <div class="result-value" id="appointmentsNeeded">62</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Total Decision Makers Reached</div>
+                    <div class="result-value" id="decisionMakers">617</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="result-label">Total Attempts Needed</div>
+                    <div class="result-value" id="totalAttempts">3,086</div>
+                </div>
+
+                <div class="result-item highlight-result">
+                    <div class="result-label">Total Daily Attempts Needed</div>
+                    <div class="result-value" id="dailyAttempts">14</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>This tool is made available for use on an 'as-is' basis. Use of the Tool constitutes the user's waiver of any and all claims against AcquisitionPRO® and David Monroe, CCIM that may arise as a result of such use, including without limitation reliance on any conclusion indicated by the Tool or any report generated by the Tool, even if the Tool is defective. All warranties, express or implied, are hereby disclaimed, including but not limited to any regarding the suitability of the Tool for any application.</p>
+            <p>&nbsp;</p>
+            <p>©2025 AcquisitionPRO® - All Rights Reserved</p>
+        </div>
+    </div>
+
+    <script>
+        function calculateNumbers() {
+            // Get input values
+            var netAcquisitionFee = parseFloat(document.getElementById('netAcquisitionFee').value) || 0;
+            var reinvestmentPercentage = (parseFloat(document.getElementById('reinvestmentPercentage').value) || 0) / 100;
+            var avgSalePrice = parseFloat(document.getElementById('avgSalePrice').value) || 0;
+            var avgAcquisitionFee = (parseFloat(document.getElementById('avgAcquisitionFee').value) || 0) / 100;
+            var closingRatio = (parseFloat(document.getElementById('closingRatio').value) || 0) / 100;
+            var opportunityRatio = (parseFloat(document.getElementById('opportunityRatio').value) || 0) / 100;
+            var appointmentRatio = (parseFloat(document.getElementById('appointmentRatio').value) || 0) / 100;
+            var contactRatio = (parseFloat(document.getElementById('contactRatio').value) || 0) / 100;
+            var attemptRatio = (parseFloat(document.getElementById('attemptRatio').value) || 0) / 100;
+            var vacationDays = parseInt(document.getElementById('vacationDays').value) || 0;
+            var sickDays = parseInt(document.getElementById('sickDays').value) || 0;
+            var conferenceDays = parseInt(document.getElementById('conferenceDays').value) || 0;
+            var trainingDays = parseInt(document.getElementById('trainingDays').value) || 0;
+
+            // Calculations based on Excel formulas
+            var grossAcquisitionFee = netAcquisitionFee / (1 - reinvestmentPercentage);
+            var totalWeeksNotProspecting = Math.ceil((vacationDays + sickDays + conferenceDays + trainingDays) / 5);
+            var weeksWorked = 52 - totalWeeksNotProspecting;
+            
+            var closingsNeeded = (grossAcquisitionFee / avgAcquisitionFee) / avgSalePrice;
+            var contractsNeeded = closingsNeeded / closingRatio;
+            var opportunitiesNeeded = contractsNeeded / opportunityRatio;
+            var appointmentsNeeded = opportunitiesNeeded / appointmentRatio;
+            var decisionMakers = appointmentsNeeded / contactRatio;
+            var totalAttempts = decisionMakers / attemptRatio;
+            var dailyAttempts = (totalAttempts / weeksWorked) / 5;
+
+            // Update display
+            document.getElementById('grossAcquisitionFee').textContent = '$' + Math.ceil(grossAcquisitionFee).toLocaleString('en-US');
+            document.getElementById('weeksWorked').textContent = weeksWorked.toString();
+            document.getElementById('closingsNeeded').textContent = Math.ceil(closingsNeeded).toString();
+            document.getElementById('contractsNeeded').textContent = Math.ceil(contractsNeeded).toString();
+            document.getElementById('opportunitiesNeeded').textContent = Math.ceil(opportunitiesNeeded).toString();
+            document.getElementById('appointmentsNeeded').textContent = Math.ceil(appointmentsNeeded).toString();
+            document.getElementById('decisionMakers').textContent = Math.ceil(decisionMakers).toString();
+            document.getElementById('totalAttempts').textContent = Math.ceil(totalAttempts).toLocaleString('en-US');
+            document.getElementById('dailyAttempts').textContent = Math.ceil(dailyAttempts).toString();
+        }
+
+        window.onload = function() {
+            calculateNumbers();
+            
+            var inputs = document.querySelectorAll('input');
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].addEventListener('input', calculateNumbers);
+            }
+        };
+    </script>
+</body>
+</html>

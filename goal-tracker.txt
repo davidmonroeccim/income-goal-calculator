@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commission Goal Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            background: #f8f9fa;
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin: 0;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 20px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            background: white;
+        }
+
+        .tab-button:hover {
+            color: #3498db;
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .results-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .panel-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8f0fe;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e8f0fe;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .highlight-result {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border-left: 4px solid #2c3e50;
+        }
+
+        .highlight-result .result-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .highlight-result .result-value {
+            color: white;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e8f0fe;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #3498db;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .metric-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-target {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-good {
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+        }
+
+        .progress-warning {
+            background: linear-gradient(90deg, #f39c12, #e67e22);
+        }
+
+        .progress-danger {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+        }
+
+        .activity-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .activity-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .activity-input label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .activity-input input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+
+        .last-saved {
+            margin: 0 10px;
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Commission Goal Tracker</h1>
+            <p>The #1 CRE Broker's Commission Goal Tracking Application</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab(event, 'goals')">Goal Calculator</button>
+            <button class="tab-button" onclick="switchTab(event, 'tracker')">Activity Tracker</button>
+        </div>
+
+        <div class="tab-content active" id="goals-tab">
+            <div class="main-content">
+                <div class="input-panel">
+                    <div class="panel-title">Input Your Goals & Ratios</div>
+                    
+                    <div class="form-section">
+                        <div class="section-title">Commission Goals</div>
+                        <div class="form-group">
+                            <label for="netCommission">Net Commission Goal ($)</label>
+                            <input type="number" id="netCommission" value="250000" step="1000">
+                        </div>
+                        <div class="form-group">
+                            <label for="commissionSplit">Company Commission Split (%)</label>
+                            <input type="number" id="commissionSplit" value="50" step="1" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="avgSalePrice">Average Sale Price ($)</label>
+                            <input type="number" id="avgSalePrice" value="3000000" step="10000">
+                        </div>
+                        <div class="form-group">
+                            <label for="avgCommission">Average Sales Commission (%)</label>
+                            <input type="number" id="avgCommission" value="3" step="0.1" min="0" max="100">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-title">Performance Ratios</div>
+                        <div class="form-group">
+                            <label for="closingRatio">Contract to Closing Ratio (%)</label>
+                            <input type="number" id="closingRatio" value="75" step="1" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentRatio">1st Appointment to Contract Ratio (%)</label>
+                            <input type="number" id="appointmentRatio" value="10" step="1" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactRatio">Contact to 1st Appointment Ratio (%)</label>
+                            <input type="number" id="contactRatio" value="10" step="1" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="attemptRatio">Attempts to Contact Ratio (%)</label>
+                            <input type="number" id="attemptRatio" value="20" step="1" min="0" max="100">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-title">Time Planning</div>
+                        <div class="form-group">
+                            <label for="vacationDays">Vacation Days Planned</label>
+                            <input type="number" id="vacationDays" value="5" step="1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="sickDays">Sick Days Projected</label>
+                            <input type="number" id="sickDays" value="5" step="1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="conferenceDays">Conference Days Planned</label>
+                            <input type="number" id="conferenceDays" value="20" step="1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="trainingDays">Training Days Planned</label>
+                            <input type="number" id="trainingDays" value="20" step="1" min="0">
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="calculateNumbers()">Calculate Your Numbers</button>
+                </div>
+
+                <div class="results-panel">
+                    <div class="panel-title">Your Required Numbers</div>
+                    
+                    <div class="result-item highlight-result">
+                        <div class="result-label">Gross Commission Goal</div>
+                        <div class="result-value" id="grossCommission">$500,000</div>
+                    </div>
+
+                    <div class="result-item highlight-result">
+                        <div class="result-label">Total Weeks Worked in Year</div>
+                        <div class="result-value" id="weeksWorked">42</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Total Closings Needed</div>
+                        <div class="result-value" id="closingsNeeded">6</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Total Contracts Needed</div>
+                        <div class="result-value" id="contractsNeeded">8</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Total 1st Appointments Needed</div>
+                        <div class="result-value" id="appointmentsNeeded">75</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Total Decision Makers Reached</div>
+                        <div class="result-value" id="decisionMakers">741</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">Total Attempts Needed</div>
+                        <div class="result-value" id="totalAttempts">3,704</div>
+                    </div>
+
+                    <div class="result-item highlight-result">
+                        <div class="result-label">Total Daily Attempts Needed</div>
+                        <div class="result-value" id="dailyAttempts">18</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tracker-tab">
+            <div style="padding: 30px;">
+                <div class="panel-title">Daily Activity Tracker</div>
+                
+                <div class="activity-form">
+                    <div class="activity-input">
+                        <label for="dailyDate">Date</label>
+                        <input type="date" id="dailyDate">
+                    </div>
+                    <div class="activity-input">
+                        <label for="dailyAttemptsMade">Attempts Made</label>
+                        <input type="number" id="dailyAttemptsMade" value="0" min="0">
+                    </div>
+                    <div class="activity-input">
+                        <label for="dailyContacts">Contacts Made</label>
+                        <input type="number" id="dailyContacts" value="0" min="0">
+                    </div>
+                    <div class="activity-input">
+                        <label for="dailyAppointments">Appointments Set</label>
+                        <input type="number" id="dailyAppointments" value="0" min="0">
+                    </div>
+                    <div class="activity-input">
+                        <label for="dailyContracts">Contracts Signed</label>
+                        <input type="number" id="dailyContracts" value="0" min="0">
+                    </div>
+                    <div class="activity-input">
+                        <label for="dailyClosings">Closings</label>
+                        <input type="number" id="dailyClosings" value="0" min="0">
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="saveActivity()" style="max-width: 300px; margin: 0 auto 30px;">Save Daily Activity</button>
+
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <button class="clear-btn" onclick="clearAllData()">Clear All Data</button>
+                    <span class="last-saved" id="lastSaved"></span>
+                </div>
+
+                <div class="panel-title">Performance Dashboard</div>
+                
+                <div class="dashboard-grid">
+                    <div class="metric-card">
+                        <div class="metric-title">Daily Attempts</div>
+                        <div class="metric-value" id="avgDailyAttempts">0</div>
+                        <div class="metric-target">Target: <span id="targetDailyAttempts">18</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="attemptsProgress"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Total Contacts</div>
+                        <div class="metric-value" id="totalContactsMade">0</div>
+                        <div class="metric-target">Target: <span id="targetContacts">741</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="contactsProgress"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Total Appointments</div>
+                        <div class="metric-value" id="totalAppointmentsMade">0</div>
+                        <div class="metric-target">Target: <span id="targetAppointments">75</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="appointmentsProgress"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Total Contracts</div>
+                        <div class="metric-value" id="totalContractsMade">0</div>
+                        <div class="metric-target">Target: <span id="targetContracts">8</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="contractsProgress"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Total Closings</div>
+                        <div class="metric-value" id="totalClosingsMade">0</div>
+                        <div class="metric-target">Target: <span id="targetClosings">6</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="closingsProgress"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Commission Progress</div>
+                        <div class="metric-value" id="commissionProgress">$0</div>
+                        <div class="metric-target">Target: <span id="targetCommission">$500,000</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="commissionProgressBar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>This tool is made available for use on an 'as-is' basis. Use of the Tool constitutes the user's waiver of any and all claims against AcquisitionPRO® and David Monroe, CCIM that may arise as a result of such use, including without limitation reliance on any conclusion indicated by the Tool or any report generated by the Tool, even if the Tool is defective. All warranties, express or implied, are hereby disclaimed, including but not limited to any regarding the suitability of the Tool for any application.</p>
+            <p>&nbsp;</p>
+            <p>©2025 AcquisitionPRO® - All Rights Reserved</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables to store goals and activities
+        let goals = {};
+        let activities = [];
+
+        function calculateNumbers() {
+            var netCommission = parseFloat(document.getElementById('netCommission').value) || 0;
+            var commissionSplit = (parseFloat(document.getElementById('commissionSplit').value) || 0) / 100;
+            var avgSalePrice = parseFloat(document.getElementById('avgSalePrice').value) || 0;
+            var avgCommission = (parseFloat(document.getElementById('avgCommission').value) || 0) / 100;
+            var closingRatio = (parseFloat(document.getElementById('closingRatio').value) || 0) / 100;
+            var appointmentRatio = (parseFloat(document.getElementById('appointmentRatio').value) || 0) / 100;
+            var contactRatio = (parseFloat(document.getElementById('contactRatio').value) || 0) / 100;
+            var attemptRatio = (parseFloat(document.getElementById('attemptRatio').value) || 0) / 100;
+            var vacationDays = parseInt(document.getElementById('vacationDays').value) || 0;
+            var sickDays = parseInt(document.getElementById('sickDays').value) || 0;
+            var conferenceDays = parseInt(document.getElementById('conferenceDays').value) || 0;
+            var trainingDays = parseInt(document.getElementById('trainingDays').value) || 0;
+
+            var grossCommission = netCommission / commissionSplit;
+            var totalWeeksNotProspecting = Math.ceil((vacationDays + sickDays + conferenceDays + trainingDays) / 5);
+            var weeksWorked = 52 - totalWeeksNotProspecting;
+            
+            var closingsNeeded = grossCommission / (avgSalePrice * avgCommission);
+            var contractsNeeded = closingsNeeded / closingRatio;
+            var appointmentsNeeded = contractsNeeded / appointmentRatio;
+            var decisionMakers = appointmentsNeeded / contactRatio;
+            var totalAttempts = decisionMakers / attemptRatio;
+            var dailyAttempts = totalAttempts / (weeksWorked * 5);
+
+            // Store goals globally
+            goals = {
+                grossCommission: Math.ceil(grossCommission),
+                weeksWorked: weeksWorked,
+                closingsNeeded: Math.ceil(closingsNeeded),
+                contractsNeeded: Math.ceil(contractsNeeded),
+                appointmentsNeeded: Math.ceil(appointmentsNeeded),
+                decisionMakers: Math.ceil(decisionMakers),
+                totalAttempts: Math.ceil(totalAttempts),
+                dailyAttempts: Math.ceil(dailyAttempts),
+                avgSalePrice: avgSalePrice,
+                avgCommission: avgCommission
+            };
+
+            // Save goals to localStorage
+            saveToLocalStorage();
+
+            document.getElementById('grossCommission').textContent = '$' + goals.grossCommission.toLocaleString('en-US');
+            document.getElementById('weeksWorked').textContent = goals.weeksWorked.toString();
+            document.getElementById('closingsNeeded').textContent = goals.closingsNeeded.toString();
+            document.getElementById('contractsNeeded').textContent = goals.contractsNeeded.toString();
+            document.getElementById('appointmentsNeeded').textContent = goals.appointmentsNeeded.toString();
+            document.getElementById('decisionMakers').textContent = goals.decisionMakers.toString();
+            document.getElementById('totalAttempts').textContent = goals.totalAttempts.toLocaleString('en-US');
+            document.getElementById('dailyAttempts').textContent = goals.dailyAttempts.toString();
+
+            // Update dashboard targets
+            updateDashboardTargets();
+        }
+
+        function switchTab(event, tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function saveActivity() {
+            const date = document.getElementById('dailyDate').value;
+            const attempts = parseInt(document.getElementById('dailyAttemptsMade').value) || 0;
+            const contacts = parseInt(document.getElementById('dailyContacts').value) || 0;
+            const appointments = parseInt(document.getElementById('dailyAppointments').value) || 0;
+            const contracts = parseInt(document.getElementById('dailyContracts').value) || 0;
+            const closings = parseInt(document.getElementById('dailyClosings').value) || 0;
+
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            // Remove existing entry for this date
+            activities = activities.filter(activity => activity.date !== date);
+            
+            // Add new activity
+            activities.push({
+                date: date,
+                attempts: attempts,
+                contacts: contacts,
+                appointments: appointments,
+                contracts: contracts,
+                closings: closings
+            });
+
+            // Sort activities by date
+            activities.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            // Save to localStorage
+            saveToLocalStorage();
+
+            // Clear form
+            document.getElementById('dailyAttemptsMade').value = '0';
+            document.getElementById('dailyContacts').value = '0';
+            document.getElementById('dailyAppointments').value = '0';
+            document.getElementById('dailyContracts').value = '0';
+            document.getElementById('dailyClosings').value = '0';
+
+            // Update dashboard
+            updateDashboard();
+
+            alert('Activity saved successfully!');
+        }
+
+        function saveToLocalStorage() {
+            try {
+                const data = {
+                    goals: goals,
+                    activities: activities,
+                    lastSaved: new Date().toISOString()
+                };
+                localStorage.setItem('brokerData', JSON.stringify(data));
+                
+                // Update last saved indicator
+                const lastSavedElement = document.getElementById('lastSaved');
+                if (lastSavedElement) {
+                    const now = new Date();
+                    lastSavedElement.textContent = 'Last saved: ' + now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+                }
+            } catch (error) {
+                console.error('Error saving data:', error);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const savedData = localStorage.getItem('brokerData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    goals = data.goals || {};
+                    activities = data.activities || [];
+                    
+                    // Update last saved indicator
+                    const lastSavedElement = document.getElementById('lastSaved');
+                    if (lastSavedElement && data.lastSaved) {
+                        const lastSaved = new Date(data.lastSaved);
+                        lastSavedElement.textContent = 'Last saved: ' + lastSaved.toLocaleDateString() + ' ' + lastSaved.toLocaleTimeString();
+                    }
+                    
+                    // Restore form values if goals exist
+                    if (Object.keys(goals).length > 0) {
+                        restoreFormValues();
+                    }
+                    
+                    return true;
+                }
+            } catch (error) {
+                console.error('Error loading saved data:', error);
+            }
+            return false;
+        }
+
+        function restoreFormValues() {
+            // Restore the calculated results
+            if (goals.grossCommission) {
+                document.getElementById('grossCommission').textContent = '$' + goals.grossCommission.toLocaleString('en-US');
+                document.getElementById('weeksWorked').textContent = goals.weeksWorked.toString();
+                document.getElementById('closingsNeeded').textContent = goals.closingsNeeded.toString();
+                document.getElementById('contractsNeeded').textContent = goals.contractsNeeded.toString();
+                document.getElementById('appointmentsNeeded').textContent = goals.appointmentsNeeded.toString();
+                document.getElementById('decisionMakers').textContent = goals.decisionMakers.toString();
+                document.getElementById('totalAttempts').textContent = goals.totalAttempts.toLocaleString('en-US');
+                document.getElementById('dailyAttempts').textContent = goals.dailyAttempts.toString();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all saved data? This cannot be undone.')) {
+                localStorage.removeItem('brokerData');
+                activities = [];
+                goals = {};
+                updateDashboard();
+                calculateNumbers();
+                document.getElementById('lastSaved').textContent = '';
+                alert('All data cleared successfully!');
+            }
+        }
+
+        function updateDashboardTargets() {
+            document.getElementById('targetDailyAttempts').textContent = goals.dailyAttempts || 18;
+            document.getElementById('targetContacts').textContent = goals.decisionMakers || 741;
+            document.getElementById('targetAppointments').textContent = goals.appointmentsNeeded || 75;
+            document.getElementById('targetContracts').textContent = goals.contractsNeeded || 8;
+            document.getElementById('targetClosings').textContent = goals.closingsNeeded || 6;
+            document.getElementById('targetCommission').textContent = '$' + (goals.grossCommission || 500000).toLocaleString('en-US');
+        }
+
+        function updateDashboard() {
+            const totals = activities.reduce((acc, activity) => {
+                acc.attempts += activity.attempts;
+                acc.contacts += activity.contacts;
+                acc.appointments += activity.appointments;
+                acc.contracts += activity.contracts;
+                acc.closings += activity.closings;
+                return acc;
+            }, {attempts: 0, contacts: 0, appointments: 0, contracts: 0, closings: 0});
+
+            const workingDays = activities.length || 1;
+            const avgDailyAttempts = Math.round(totals.attempts / workingDays);
+
+            // Calculate commission progress
+            const commissionEarned = totals.closings * (goals.avgSalePrice || 3000000) * (goals.avgCommission || 0.03);
+
+            // Update display values
+            document.getElementById('avgDailyAttempts').textContent = avgDailyAttempts;
+            document.getElementById('totalContactsMade').textContent = totals.contacts;
+            document.getElementById('totalAppointmentsMade').textContent = totals.appointments;
+            document.getElementById('totalContractsMade').textContent = totals.contracts;
+            document.getElementById('totalClosingsMade').textContent = totals.closings;
+            document.getElementById('commissionProgress').textContent = '$' + Math.round(commissionEarned).toLocaleString('en-US');
+
+            // Update progress bars
+            updateProgressBar('attemptsProgress', avgDailyAttempts, goals.dailyAttempts || 18);
+            updateProgressBar('contactsProgress', totals.contacts, goals.decisionMakers || 741);
+            updateProgressBar('appointmentsProgress', totals.appointments, goals.appointmentsNeeded || 75);
+            updateProgressBar('contractsProgress', totals.contracts, goals.contractsNeeded || 8);
+            updateProgressBar('closingsProgress', totals.closings, goals.closingsNeeded || 6);
+            updateProgressBar('commissionProgressBar', commissionEarned, goals.grossCommission || 500000);
+        }
+
+        function updateProgressBar(elementId, current, target) {
+            const percentage = Math.min((current / target) * 100, 100);
+            const progressBar = document.getElementById(elementId);
+            
+            if (progressBar) {
+                progressBar.style.width = percentage + '%';
+                
+                // Color coding based on progress
+                if (percentage >= 80) {
+                    progressBar.className = 'progress-fill progress-good';
+                } else if (percentage >= 50) {
+                    progressBar.className = 'progress-fill progress-warning';
+                } else {
+                    progressBar.className = 'progress-fill progress-danger';
+                }
+            }
+        }
+
+        window.onload = function() {
+            // Load saved data first
+            loadFromLocalStorage();
+            
+            // Set today's date as default
+            const today = new Date();
+            const dateString = today.getFullYear() + '-' + 
+                String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(today.getDate()).padStart(2, '0');
+            document.getElementById('dailyDate').value = dateString;
+            
+            calculateNumbers();
+            
+            var inputs = document.querySelectorAll('#goals-tab input');
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].addEventListener('input', calculateNumbers);
+            }
+
+            updateDashboard();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "name": "Income Goal Calculator - AcquisitionPRO®",
+  "short_name": "Goal Calculator",
+  "description": "The #1 commercial real estate goal calculator and tracker for brokers and investors",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#071D3E",
+  "theme_color": "#2A8BBD",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "/images/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/favicon.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "screenshots": [
+    {
+      "src": "/images/logo.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Free Calculator",
+      "short_name": "Calculator",
+      "description": "Access the free goal calculator",
+      "url": "/calculator",
+      "icons": [
+        {
+          "src": "/images/icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Login",
+      "short_name": "Login",
+      "description": "Login to your account",
+      "url": "/login",
+      "icons": [
+        {
+          "src": "/images/icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}
