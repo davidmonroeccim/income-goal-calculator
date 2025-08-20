@@ -19,12 +19,12 @@ app.set('trust proxy', 1);
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https://storage.googleapis.com", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://cdn.jsdelivr.net", "https://player.vimeo.com"],
-      connectSrc: ["'self'", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co", "https://api.stripe.com", "https://player.vimeo.com"],
+      defaultSrc: ["'self'", "http://igc.acquisitionpro.io", "http://igc.acquisitionpro.io:3000"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "http://igc.acquisitionpro.io", "http://igc.acquisitionpro.io:3000"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "http://igc.acquisitionpro.io", "http://igc.acquisitionpro.io:3000"],
+      imgSrc: ["'self'", "data:", "https://storage.googleapis.com", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co", "http://igc.acquisitionpro.io", "http://igc.acquisitionpro.io:3000"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://cdn.jsdelivr.net", "https://player.vimeo.com", "http://igc.acquisitionpro.io", "http://igc.acquisitionpro.io:3000"],
+      connectSrc: ["'self'", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co", "https://api.stripe.com", "https://player.vimeo.com", "http://igc.acquisitionpro.io", "http://igc.acquisitionpro.io:3000"],
       frameSrc: ["'self'", "https://js.stripe.com", "https://player.vimeo.com"]
     },
   },
@@ -53,7 +53,7 @@ const authLimiter = rateLimit({
 // CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://acquisitionpro.io', 'https://www.acquisitionpro.io']
+    ? ['https://acquisitionpro.io', 'https://www.acquisitionpro.io', 'http://igc.acquisitionpro.io', 'http://igc.acquisitionpro.io:3000']
     : ['http://localhost:3000'],
   credentials: true
 }));
@@ -78,10 +78,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: false, // Set to false since we're running HTTP in production for now
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'strict'
+    sameSite: 'lax' // Changed from 'strict' to 'lax' for better compatibility
   }
 }));
 
