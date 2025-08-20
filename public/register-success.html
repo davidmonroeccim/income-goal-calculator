@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Income Goal Calculator | AcquisitionPRO®</title>
+    <meta name="description" content="Your payment was successful. Complete your account setup to access your premium features.">
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/images/icon.png">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css?v=1.1">
+    <link rel="stylesheet" href="/css/marketing.css?v=1.1">
+    
+    <style>
+        .register-form-container {
+            background: var(--white);
+            padding: var(--spacing-2xl);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--gray-200);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary-blue), var(--accent-yellow));
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            color: var(--primary-navy);
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            position: relative;
+        }
+
+        .form-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--accent-yellow);
+            border-radius: 2px;
+        }
+
+        .register-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--primary-navy);
+            font-size: var(--font-size-sm);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-input {
+            padding: var(--spacing-md);
+            border: 2px solid var(--gray-300);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-md);
+            transition: all 0.3s ease;
+            background: var(--white);
+            color: var(--text-primary);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-input:invalid {
+            border-color: var(--error-color);
+        }
+
+        .form-help {
+            color: var(--text-muted);
+            font-size: var(--font-size-xs);
+            margin-top: var(--spacing-xs);
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-radius: var(--border-radius-md);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: var(--spacing-md);
+        }
+
+        .form-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .form-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-loading {
+            display: none;
+        }
+
+        .form-submit:disabled .btn-text {
+            display: none;
+        }
+
+        .form-submit:disabled .btn-loading {
+            display: inline;
+        }
+
+        /* Success styling improvements */
+        .success-section {
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+        }
+
+        .success-content {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--success-color);
+            margin-bottom: var(--spacing-lg);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .message {
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+            font-weight: 500;
+        }
+
+        .message.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .message.success {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Marketing Header -->
+    <header class="marketing-header">
+        <div class="container">
+            <nav class="marketing-nav">
+                <div class="marketing-brand">
+                    <img src="/images/logo.png" alt="AcquisitionPRO® Logo" class="marketing-logo">
+                </div>
+                <ul class="marketing-nav-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/calculator">Free Calculator</a></li>
+                    <li><a href="/pricing">Pricing</a></li>
+                </ul>
+                <div class="marketing-nav-cta">
+                    <a href="/login" class="btn btn-outline btn-small">Login</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Success Section -->
+    <section class="success-section" style="padding: var(--spacing-2xl) 0; background: var(--gray-50); min-height: 60vh;">
+        <div class="container">
+            <div id="messageContainer"></div>
+            
+            <div class="success-content" style="max-width: 600px; margin: 0 auto; text-align: center;">
+                <div class="success-icon" style="font-size: 4rem; color: var(--success-color); margin-bottom: var(--spacing-lg);">
+                    ✅
+                </div>
+                
+                <h1 style="color: var(--primary-navy); margin-bottom: var(--spacing-lg);">
+                    Payment Successful!
+                </h1>
+                
+                <p style="font-size: var(--font-size-lg); color: var(--text-secondary); margin-bottom: var(--spacing-xl);">
+                    Thank you for your purchase! Now let's create your account to access your premium features.
+                </p>
+
+                <!-- Registration Form -->
+                <div class="register-form-container">
+                    <h2 class="form-title">Create Your Account</h2>
+                    
+                    <form id="registerForm" class="register-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName" class="form-label">First Name *</label>
+                                <input type="text" id="firstName" name="firstName" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lastName" class="form-label">Last Name *</label>
+                                <input type="text" id="lastName" name="lastName" class="form-input" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" id="email" name="email" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password *</label>
+                            <input type="password" id="password" name="password" class="form-input" required minlength="6">
+                            <small class="form-help">At least 6 characters</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="userType" class="form-label">I am a *</label>
+                            <select id="userType" name="userType" class="form-input" required>
+                                <option value="">Select your role</option>
+                                <option value="broker">Commercial Real Estate Broker</option>
+                                <option value="investor">Commercial Real Estate Investor</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-large form-submit">
+                            <span class="btn-text">Create Account & Access Features</span>
+                            <span class="btn-loading" style="display: none;">Creating Account...</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marketing Footer -->
+    <footer class="marketing-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="/images/logo.png" alt="AcquisitionPRO® Logo" class="footer-logo">
+                    <p class="footer-description">
+                        The #1 commercial real estate goal calculator and activity tracker for brokers and investors.
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/calculator">Free Calculator</a></li>
+                        <li><a href="/pricing">Pricing</a></li>
+                        <li><a href="/features">Features</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="https://goacquisitionpro.com/privacy-policy" target="_blank">Privacy Policy</a></li>
+                        <li><a href="https://goacquisitionpro.com/terms-conditions" target="_blank">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>©2025 AcquisitionPRO® - All Rights Reserved | 853 Dauphin St Suite C Mobile, AL 36602</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let sessionId = null;
+        let planType = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            sessionId = urlParams.get('session_id');
+            planType = urlParams.get('plan');
+            
+            if (!sessionId) {
+                showMessage('error', 'Invalid session. Please contact support.');
+                return;
+            }
+            
+            // Check if user is already logged in
+            checkIfAlreadyLoggedIn();
+            
+            // Verify payment session
+            verifyPaymentSession();
+        });
+
+        // Check if user is already logged in
+        async function checkIfAlreadyLoggedIn() {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const response = await fetch('/api/auth/profile', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        // User is already logged in, redirect to subscription success
+                        showMessage('success', 'Payment successful! Redirecting to your dashboard...');
+                        setTimeout(() => {
+                            window.location.href = '/subscription-success?session_id=' + sessionId;
+                        }, 2000);
+                        return;
+                    }
+                }
+            } catch (error) {
+                // If auth check fails, continue with registration flow
+                console.log('Auth check failed, proceeding with registration');
+            }
+        }
+
+        // Verify payment session
+        async function verifyPaymentSession() {
+            try {
+                const response = await fetch('/api/subscriptions/verify-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ sessionId })
+                });
+
+                const data = await response.json();
+                
+                if (!data.success) {
+                    showMessage('error', 'Payment verification failed. Please contact support.');
+                }
+            } catch (error) {
+                console.error('Error verifying payment session:', error);
+                showMessage('error', 'Unable to verify payment. Please contact support.');
+            }
+        }
+
+        // Handle registration form
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const userData = {
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                userType: formData.get('userType'),
+                sessionId: sessionId,
+                planType: planType
+            };
+
+            try {
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                const originalText = submitButton.textContent;
+                submitButton.disabled = true;
+                submitButton.textContent = 'Creating Account...';
+
+                const response = await fetch('/api/auth/register-after-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store token and redirect to dashboard
+                    localStorage.setItem('token', data.token);
+                    showMessage('success', 'Account created successfully! Redirecting to your dashboard...');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                } else {
+                    showMessage('error', data.error || 'Failed to create account');
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalText;
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showMessage('error', 'An error occurred. Please try again.');
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            }
+        });
+
+        // Show message function
+        function showMessage(type, message) {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `<div class="message ${type}" style="margin-bottom: var(--spacing-lg); padding: var(--spacing-md); border-radius: var(--border-radius-md); text-align: center;">${message}</div>`;
+
+            if (type === 'success') {
+                container.querySelector('.message').style.backgroundColor = 'rgba(34, 197, 94, 0.1)';
+                container.querySelector('.message').style.color = '#16a34a';
+                container.querySelector('.message').style.border = '1px solid rgba(34, 197, 94, 0.3)';
+            } else {
+                container.querySelector('.message').style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                container.querySelector('.message').style.color = '#dc2626';
+                container.querySelector('.message').style.border = '1px solid rgba(239, 68, 68, 0.3)';
+            }
+
+            setTimeout(() => {
+                if (type !== 'success') { // Keep success messages visible
+                    container.innerHTML = '';
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

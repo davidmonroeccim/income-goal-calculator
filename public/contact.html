@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Income Goal Calculator | AcquisitionPRO®</title>
+    <meta name="description" content="Contact AcquisitionPRO for support, questions, or feedback about the Income Goal Calculator. We're here to help you succeed.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/images/icon.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css?v=1.2">
+    <link rel="stylesheet" href="/css/marketing.css?v=1.2">
+    
+    <style>
+        .contact-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: var(--spacing-2xl) var(--spacing-lg);
+        }
+        
+        .contact-header {
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-2xl);
+            margin-top: var(--spacing-2xl);
+        }
+        
+        .contact-info {
+            background: var(--gray-50);
+            padding: var(--spacing-2xl);
+            border-radius: var(--border-radius-lg);
+            border-left: 4px solid var(--secondary-blue);
+        }
+        
+        .contact-form {
+            background: var(--white);
+            padding: var(--spacing-2xl);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .info-icon {
+            background: var(--secondary-blue);
+            color: var(--white);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-lg);
+            flex-shrink: 0;
+        }
+        
+        .info-content h3 {
+            color: var(--primary-navy);
+            margin-bottom: var(--spacing-xs);
+            font-size: var(--font-size-lg);
+        }
+        
+        .info-content p {
+            color: var(--gray-700);
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        .info-content a {
+            color: var(--secondary-blue);
+            text-decoration: none;
+        }
+        
+        .info-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-navy);
+            font-weight: 600;
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 2px solid var(--gray-300);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-base);
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(42, 139, 189, 0.1);
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 2px solid var(--gray-300);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-base);
+            background: var(--white);
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(42, 139, 189, 0.1);
+        }
+        
+        .submit-btn {
+            background: var(--secondary-blue);
+            color: var(--white);
+            border: none;
+            padding: var(--spacing-md) var(--spacing-xl);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .submit-btn:hover {
+            background: var(--primary-navy);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .submit-btn:disabled {
+            background: var(--gray-400);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .form-message {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .form-message.success {
+            background: rgba(34, 197, 94, 0.1);
+            color: rgb(22, 163, 74);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .form-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: rgb(220, 38, 38);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .faq-section {
+            margin-top: var(--spacing-2xl);
+            padding-top: var(--spacing-2xl);
+            border-top: 2px solid var(--gray-200);
+        }
+        
+        .faq-item {
+            background: var(--white);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .faq-question {
+            color: var(--primary-navy);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            font-size: var(--font-size-lg);
+        }
+        
+        .faq-answer {
+            color: var(--gray-700);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-xl);
+            }
+            
+            .contact-info {
+                order: 2;
+            }
+            
+            .contact-form {
+                order: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Marketing Header -->
+    <header class="marketing-header">
+        <div class="container">
+            <nav class="marketing-nav">
+                <div class="marketing-brand">
+                    <a href="/">
+                        <img src="/images/logo.png" alt="AcquisitionPRO® Logo" class="marketing-logo">
+                    </a>
+                </div>
+                <ul class="marketing-nav-links">
+                    <li><a href="/#features">Features</a></li>
+                    <li><a href="/calculator">Free Calculator</a></li>
+                    <li><a href="/pricing">Pricing</a></li>
+                </ul>
+                <div class="marketing-nav-cta">
+                    <a href="/login" class="btn btn-outline btn-small">Login</a>
+                    <a href="/register" class="btn btn-primary btn-small">Get Started</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="contact-container">
+        <div class="contact-header">
+            <h1>Contact Us</h1>
+            <p>Have questions about the Income Goal Calculator? Need help with your account? We're here to support your success.</p>
+        </div>
+
+        <div class="contact-grid">
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <h2>Get in Touch</h2>
+                
+                <div class="info-item">
+                    <div class="info-icon">📧</div>
+                    <div class="info-content">
+                        <h3>Email Support</h3>
+                        <p>For general inquiries and support:<br>
+                        <a href="mailto:support@acquisitionpro.io">support@acquisitionpro.io</a></p>
+                        <p>For billing and account issues:<br>
+                        <a href="mailto:billing@acquisitionpro.io">billing@acquisitionpro.io</a></p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon">📍</div>
+                    <div class="info-content">
+                        <h3>Office Address</h3>
+                        <p>AcquisitionPRO®<br>
+                        853 Dauphin St Suite C<br>
+                        Mobile, AL 36602<br>
+                        United States</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon">⏰</div>
+                    <div class="info-content">
+                        <h3>Support Hours</h3>
+                        <p>Monday - Friday: 9:00 AM - 6:00 PM CST<br>
+                        Saturday: 10:00 AM - 2:00 PM CST<br>
+                        Sunday: Closed</p>
+                        <p><em>We typically respond within 24 hours</em></p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon">💬</div>
+                    <div class="info-content">
+                        <h3>Quick Help</h3>
+                        <p>For immediate assistance:</p>
+                        <p>• Check our <a href="#faq">FAQ section</a> below<br>
+                        • Review our <a href="/pricing">pricing plans</a><br>
+                        • Try our <a href="/calculator">free calculator</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="contact-form">
+                <h2>Send us a Message</h2>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name" class="form-label">Your Name *</label>
+                        <input type="text" id="name" name="name" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address *</label>
+                        <input type="email" id="email" name="email" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject" class="form-label">Subject *</label>
+                        <select id="subject" name="subject" class="form-select" required>
+                            <option value="">Please select a subject</option>
+                            <option value="general">General Question</option>
+                            <option value="support">Technical Support</option>
+                            <option value="billing">Billing Question</option>
+                            <option value="feature">Feature Request</option>
+                            <option value="bug">Bug Report</option>
+                            <option value="business">Business Inquiry</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userType" class="form-label">I am a:</label>
+                        <select id="userType" name="userType" class="form-select">
+                            <option value="">Please select</option>
+                            <option value="broker">Commercial Real Estate Broker</option>
+                            <option value="investor">Real Estate Investor</option>
+                            <option value="both">Both Broker and Investor</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message" class="form-label">Message *</label>
+                        <textarea id="message" name="message" class="form-textarea" 
+                                placeholder="Please describe your question or issue in detail. The more information you provide, the better we can help you." required></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        Send Message
+                    </button>
+
+                    <div id="formMessage" class="form-message"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <section class="faq-section" id="faq">
+            <h2 class="text-center">Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">How do I get started with the Income Goal Calculator?</div>
+                <div class="faq-answer">You can start immediately with our free calculator - no registration required! Just visit the <a href="/calculator">calculator page</a> and input your income goals and performance ratios to get your daily activity targets. For advanced features like activity tracking and progress dashboards, you can upgrade to a Pro account.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What's the difference between the free and Pro versions?</div>
+                <div class="faq-answer">The free version includes full goal calculations for both brokers and investors. Pro adds daily activity tracking, progress dashboards, historical data, dual-role support, and goal saving across sessions. Check our <a href="/pricing">pricing page</a> for a complete feature comparison.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I track both broker and investor activities separately?</div>
+                <div class="faq-answer">Yes! Our Pro version includes dual-role support, allowing you to set separate goals and track activities independently for both your brokerage and investment work. Many CRE professionals wear both hats, and our platform is designed specifically for this.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How do I cancel my subscription?</div>
+                <div class="faq-answer">You can cancel your subscription anytime through your account profile page or by contacting us. Cancellations take effect at the end of your current billing period, so you'll retain access until then. We also offer a 30-day money-back guarantee for new subscribers.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Is my data secure and private?</div>
+                <div class="faq-answer">Absolutely. We use industry-standard encryption and security measures to protect your data. We never sell or share your personal information with third parties. You can read our complete <a href="/privacy">Privacy Policy</a> for full details on how we protect and use your information.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I export my data?</div>
+                <div class="faq-answer">Yes, Pro users can export all their goal calculations and activity data in machine-readable formats. This feature is available in your account profile under "Export Data."</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Marketing Footer -->
+    <footer class="marketing-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="/images/logo.png" alt="AcquisitionPRO® Logo" class="footer-logo">
+                    <p class="footer-description">
+                        The #1 commercial real estate goal calculator and activity tracker for brokers and investors.
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/calculator">Free Calculator</a></li>
+                        <li><a href="/pricing">Pricing</a></li>
+                        <li><a href="/#features">Features</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms of Service</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>©2025 AcquisitionPRO® - All Rights Reserved | 853 Dauphin St Suite C Mobile, AL 36602</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Contact form handling
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const formMessage = document.getElementById('formMessage');
+            
+            // Disable submit button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            formMessage.style.display = 'none';
+            
+            // Get form data
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                // Simulate form submission (replace with actual endpoint)
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Show success message
+                formMessage.className = 'form-message success';
+                formMessage.textContent = 'Thank you! Your message has been sent successfully. We\'ll get back to you within 24 hours.';
+                formMessage.style.display = 'block';
+                
+                // Reset form
+                this.reset();
+                
+                // Log form data for development (remove in production)
+                console.log('Contact form submission:', data);
+                
+            } catch (error) {
+                // Show error message
+                formMessage.className = 'form-message error';
+                formMessage.textContent = 'Sorry, there was an error sending your message. Please try again or email us directly.';
+                formMessage.style.display = 'block';
+                
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Message';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Income Goal Calculator</title>
+    <meta name="description" content="Login to your Income Goal Calculator account">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css?v=1.1">
+    <link rel="stylesheet" href="/css/app.css?v=1.1">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <div class="auth-form-container">
+                    <div style="text-align: center; margin-bottom: var(--spacing-xl);">
+                        <h1 style="color: var(--primary-navy); font-size: var(--font-size-4xl); margin-bottom: var(--spacing-lg);">Income Goal Calculator</h1>
+                    </div>
+                    <div class="auth-form-card">
+                        <div class="auth-form-header">
+                            <h1>Welcome Back</h1>
+                            <p>Sign In To Access Your CRE Income Goal Calculator And Tracker</p>
+                        </div>
+
+                        <!-- URL Parameter Messages -->
+                        <div id="urlMessageContainer" class="message-container" style="display: none;"></div>
+
+                        <!-- Login Form -->
+                        <form id="loginForm" class="auth-form">
+                            <!-- Error/Success Messages -->
+                            <div id="messageContainer" class="message-container" style="display: none;"></div>
+
+                            <!-- Email Field -->
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input 
+                                    type="email" 
+                                    id="email" 
+                                    name="email" 
+                                    class="form-input" 
+                                    required
+                                    autocomplete="email"
+                                    placeholder="Enter your email address"
+                                >
+                                <div class="form-error" id="emailError"></div>
+                            </div>
+
+                            <!-- Password Field -->
+                            <div class="form-group">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="password-field">
+                                    <input 
+                                        type="password" 
+                                        id="password" 
+                                        name="password" 
+                                        class="form-input" 
+                                        required
+                                        autocomplete="current-password"
+                                        placeholder="Enter your password"
+                                    >
+                                    <button type="button" class="password-toggle" id="passwordToggle">
+                                        <span class="show-text">Show</span>
+                                        <span class="hide-text" style="display: none;">Hide</span>
+                                    </button>
+                                </div>
+                                <div class="form-error" id="passwordError"></div>
+                            </div>
+
+                            <!-- Remember Me and Forgot Password -->
+                            <div class="form-group form-row">
+                                <div class="checkbox-field">
+                                    <input type="checkbox" id="rememberMe" name="rememberMe">
+                                    <label for="rememberMe" class="checkbox-label">Remember me</label>
+                                </div>
+                                <a href="#" id="forgotPasswordLink" class="forgot-password-link">Forgot Password?</a>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary btn-full" id="loginButton">
+                                    <span class="button-text">Sign In</span>
+                                    <span class="button-loading" style="display: none;">
+                                        <span class="spinner"></span>
+                                        Signing In...
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Forgot Password Form (Hidden by default) -->
+                        <form id="forgotPasswordForm" class="auth-form" style="display: none;">
+                            <div class="form-group">
+                                <label for="resetEmail" class="form-label">Email Address</label>
+                                <input 
+                                    type="email" 
+                                    id="resetEmail" 
+                                    name="resetEmail" 
+                                    class="form-input" 
+                                    required
+                                    placeholder="Enter your email address"
+                                >
+                                <div class="form-error" id="resetEmailError"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary btn-full" id="resetButton">
+                                    <span class="button-text">Send Reset Link</span>
+                                    <span class="button-loading" style="display: none;">
+                                        <span class="spinner"></span>
+                                        Sending...
+                                    </span>
+                                </button>
+                            </div>
+
+                            <div class="form-group">
+                                <button type="button" class="btn btn-secondary btn-full" id="backToLoginButton">
+                                    Back to Login
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Social Login (Future Feature) -->
+                        <!-- <div class="social-login">
+                            <div class="divider">
+                                <span>or continue with</span>
+                            </div>
+                            <div class="social-buttons">
+                                <button class="btn btn-social btn-google">
+                                    <span>Google</span>
+                                </button>
+                            </div>
+                        </div> -->
+
+                        <!-- Register Link -->
+                        <div class="auth-form-footer" id="loginFooter">
+                            <p>Don't have an account? <a href="/register">Create one here</a></p>
+                        </div>
+
+                        <div class="auth-form-footer" id="resetFooter" style="display: none;">
+                            <p>Remember your password? <a href="#" id="backToLoginLink">Sign in here</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-logo-section">
+                        <img src="/images/logo.png" alt="AcquisitionPRO Logo" class="footer-logo">
+                        <p>&copy; 2024 AcquisitionPRO. All rights reserved.</p>
+                    </div>
+                    <div class="footer-links">
+                        <a href="/privacy">Privacy Policy</a>
+                        <a href="/terms">Terms of Service</a>
+                        <a href="/contact">Contact</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://jkwkrtnwdlyxhiqdmbtm.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imprd2tydG53ZGx5eGhpcWRtYnRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2MTgyMDYsImV4cCI6MjA3MTE5NDIwNn0.AIR6IH6XruUiTMNczYDb9twFb6pvFgeQTTNYmuRt5oU';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+        // DOM Elements
+        const loginForm = document.getElementById('loginForm');
+        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+        const loginButton = document.getElementById('loginButton');
+        const resetButton = document.getElementById('resetButton');
+        const messageContainer = document.getElementById('messageContainer');
+        const urlMessageContainer = document.getElementById('urlMessageContainer');
+        const passwordToggle = document.getElementById('passwordToggle');
+        
+        // Form toggle elements
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const backToLoginButton = document.getElementById('backToLoginButton');
+        const backToLoginLink = document.getElementById('backToLoginLink');
+        const loginFooter = document.getElementById('loginFooter');
+        const resetFooter = document.getElementById('resetFooter');
+
+        // Check for URL parameters on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Handle messages from URL parameters
+            const message = urlParams.get('message');
+            const error = urlParams.get('error');
+            
+            if (message) {
+                if (message === 'registration_success') {
+                    showUrlMessage('Registration successful! Please check your email to verify your account before logging in.', 'success');
+                } else if (message === 'email_verified') {
+                    showUrlMessage('Email verified successfully! You can now log in.', 'success');
+                } else if (message === 'password_reset') {
+                    showUrlMessage('Password reset successful! You can now log in with your new password.', 'success');
+                }
+            }
+            
+            if (error) {
+                if (error === 'verification_failed') {
+                    showUrlMessage('Email verification failed. Please try again or contact support.', 'error');
+                } else if (error === 'session_expired') {
+                    showUrlMessage('Your session has expired. Please log in again.', 'warning');
+                }
+            }
+
+            // Handle redirect parameter
+            const redirect = urlParams.get('redirect');
+            if (redirect) {
+                document.getElementById('loginForm').dataset.redirect = redirect;
+            }
+
+            // Clean URL
+            if (message || error) {
+                const cleanUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+            }
+        });
+
+        // Password visibility toggle
+        passwordToggle.addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const showText = this.querySelector('.show-text');
+            const hideText = this.querySelector('.hide-text');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                showText.style.display = 'none';
+                hideText.style.display = 'inline';
+            } else {
+                passwordInput.type = 'password';
+                showText.style.display = 'inline';
+                hideText.style.display = 'none';
+            }
+        });
+
+        // Form toggle functions
+        function showForgotPasswordForm() {
+            loginForm.style.display = 'none';
+            forgotPasswordForm.style.display = 'block';
+            loginFooter.style.display = 'none';
+            resetFooter.style.display = 'block';
+            clearMessages();
+            
+            // Copy email if already entered
+            const loginEmail = document.getElementById('email').value;
+            if (loginEmail) {
+                document.getElementById('resetEmail').value = loginEmail;
+            }
+        }
+
+        function showLoginForm() {
+            loginForm.style.display = 'block';
+            forgotPasswordForm.style.display = 'none';
+            loginFooter.style.display = 'block';
+            resetFooter.style.display = 'none';
+            clearMessages();
+        }
+
+        // Event listeners for form toggles
+        forgotPasswordLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showForgotPasswordForm();
+        });
+
+        backToLoginButton.addEventListener('click', showLoginForm);
+        backToLoginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoginForm();
+        });
+
+        // Utility functions
+        function showMessage(message, type = 'info') {
+            messageContainer.className = `message-container message-${type}`;
+            messageContainer.textContent = message;
+            messageContainer.style.display = 'block';
+            messageContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function showUrlMessage(message, type = 'info') {
+            urlMessageContainer.className = `message-container message-${type}`;
+            urlMessageContainer.textContent = message;
+            urlMessageContainer.style.display = 'block';
+        }
+
+        function clearMessages() {
+            messageContainer.style.display = 'none';
+            urlMessageContainer.style.display = 'none';
+            
+            // Clear field errors
+            const errorElements = document.querySelectorAll('.form-error');
+            errorElements.forEach(element => {
+                element.textContent = '';
+                element.style.display = 'none';
+            });
+        }
+
+        function showFieldError(fieldId, message) {
+            const errorElement = document.getElementById(fieldId);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        function setLoadingState(button, loading) {
+            const buttonText = button.querySelector('.button-text');
+            const buttonLoading = button.querySelector('.button-loading');
+            
+            if (loading) {
+                button.disabled = true;
+                buttonText.style.display = 'none';
+                buttonLoading.style.display = 'flex';
+            } else {
+                button.disabled = false;
+                buttonText.style.display = 'block';
+                buttonLoading.style.display = 'none';
+            }
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Login form submission
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            setLoadingState(loginButton, true);
+            clearMessages();
+
+            try {
+                const formData = new FormData(loginForm);
+                const loginData = {
+                    email: formData.get('email').trim().toLowerCase(),
+                    password: formData.get('password'),
+                    rememberMe: formData.get('rememberMe') === 'on'
+                };
+
+                // Basic validation
+                if (!loginData.email || !loginData.password) {
+                    showMessage('Please enter both email and password.', 'error');
+                    setLoadingState(loginButton, false);
+                    return;
+                }
+
+                if (!isValidEmail(loginData.email)) {
+                    showFieldError('emailError', 'Please enter a valid email address');
+                    setLoadingState(loginButton, false);
+                    return;
+                }
+
+                console.log('Submitting login:', { ...loginData, password: '[HIDDEN]' });
+
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                const result = await response.json();
+                console.log('Login response:', result);
+
+                if (response.ok) {
+                    showMessage('Login successful! Redirecting...', 'success');
+                    
+                    // Store auth tokens
+                    if (result.session) {
+                        localStorage.setItem('access_token', result.session.access_token);
+                        localStorage.setItem('refresh_token', result.session.refresh_token);
+                        localStorage.setItem('user_profile', JSON.stringify(result.user.profile));
+                    }
+                    
+                    // Redirect to intended page or dashboard
+                    const redirect = loginForm.dataset.redirect;
+                    const redirectUrl = redirect ? decodeURIComponent(redirect) : '/app';
+                    
+                    setTimeout(() => {
+                        window.location.href = redirectUrl;
+                    }, 1500);
+                    
+                } else {
+                    // Handle specific error codes
+                    if (result.code === 'INVALID_CREDENTIALS') {
+                        showMessage('Invalid email or password. Please try again.', 'error');
+                    } else if (result.code === 'EMAIL_NOT_VERIFIED') {
+                        showMessage('Please verify your email address before logging in. Check your inbox for the verification link.', 'warning');
+                    } else if (result.code === 'RATE_LIMIT_EXCEEDED') {
+                        showMessage('Too many login attempts. Please wait 15 minutes before trying again.', 'error');
+                    } else {
+                        showMessage(result.error || 'Login failed. Please try again.', 'error');
+                    }
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                setLoadingState(loginButton, false);
+            }
+        });
+
+        // Forgot password form submission
+        forgotPasswordForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            setLoadingState(resetButton, true);
+            clearMessages();
+
+            try {
+                const email = document.getElementById('resetEmail').value.trim().toLowerCase();
+
+                if (!email) {
+                    showFieldError('resetEmailError', 'Email is required');
+                    setLoadingState(resetButton, false);
+                    return;
+                }
+
+                if (!isValidEmail(email)) {
+                    showFieldError('resetEmailError', 'Please enter a valid email address');
+                    setLoadingState(resetButton, false);
+                    return;
+                }
+
+                console.log('Sending password reset for:', email);
+
+                const response = await fetch('/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showMessage(
+                        'If an account with this email exists, a password reset link has been sent. Please check your inbox and spam folder.',
+                        'success'
+                    );
+                    
+                    // Clear the form
+                    document.getElementById('resetEmail').value = '';
+                    
+                    // Show login form after delay
+                    setTimeout(() => {
+                        showLoginForm();
+                    }, 3000);
+                    
+                } else {
+                    showMessage(result.error || 'Unable to send reset email. Please try again.', 'error');
+                }
+
+            } catch (error) {
+                console.error('Password reset error:', error);
+                showMessage('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                setLoadingState(resetButton, false);
+            }
+        });
+
+        // Real-time email validation
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (email && !isValidEmail(email)) {
+                showFieldError('emailError', 'Please enter a valid email address');
+            } else {
+                document.getElementById('emailError').style.display = 'none';
+            }
+        });
+
+        document.getElementById('resetEmail').addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (email && !isValidEmail(email)) {
+                showFieldError('resetEmailError', 'Please enter a valid email address');
+            } else {
+                document.getElementById('resetEmailError').style.display = 'none';
+            }
+        });
+    </script>
+
+    <!-- Iframe Detection -->
+    <script src="/js/iframe-detector.js"></script>
+</body>
+</html>

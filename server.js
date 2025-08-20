@@ -22,10 +22,10 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https://storage.googleapis.com", "https://xnaqzwahcxnsnfewofzb.supabase.co"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com"],
-      connectSrc: ["'self'", "https://xnaqzwahcxnsnfewofzb.supabase.co", "https://api.stripe.com"],
-      frameSrc: ["'self'", "https://js.stripe.com"]
+      imgSrc: ["'self'", "data:", "https://storage.googleapis.com", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://cdn.jsdelivr.net", "https://player.vimeo.com"],
+      connectSrc: ["'self'", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co", "https://api.stripe.com", "https://player.vimeo.com"],
+      frameSrc: ["'self'", "https://js.stripe.com", "https://player.vimeo.com"]
     },
   },
   crossOriginEmbedderPolicy: false
@@ -44,7 +44,7 @@ app.use('/api/', limiter);
 // Stricter rate limiting for auth endpoints
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
+  max: process.env.NODE_ENV === 'production' ? 5 : 50, // More lenient for development
   message: 'Too many authentication attempts, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
@@ -108,12 +108,12 @@ app.use(express.static(path.join(__dirname, 'public'), {
 // API Routes
 app.use('/api/auth', authLimiter);
 
-// Import route handlers (to be created)
-// app.use('/api/auth', require('./routes/auth'));
-// app.use('/api/goals', require('./routes/goals'));
-// app.use('/api/activities', require('./routes/activities'));
-// app.use('/api/subscriptions', require('./routes/subscriptions'));
-// app.use('/webhooks', require('./routes/webhooks'));
+// Import route handlers
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/goals', require('./routes/goals'));
+app.use('/api/activities', require('./routes/activities'));
+app.use('/api/subscriptions', require('./routes/subscriptions'));
+app.use('/api/highlevel', require('./routes/highlevel'));
 
 // Basic API health check
 app.get('/api/health', (req, res) => {
@@ -145,12 +145,41 @@ app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
+app.get('/register-success', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register-success.html'));
+});
+
+app.get('/reset-password', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));
+});
+
 app.get('/app', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'app.html'));
 });
 
 app.get('/profile', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
+
+app.get('/activities', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'activities.html'));
+});
+
+app.get('/subscription-success', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'subscription-success.html'));
+});
+
+// Legal and informational pages
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'privacy.html'));
+});
+
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'terms.html'));
+});
+
+app.get('/contact', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'contact.html'));
 });
 
 // Iframe-specific routes for HighLevel integration (authenticated app only)
@@ -202,10 +231,23 @@ process.on('SIGINT', () => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Income Goal Calculator server running on port ${PORT}`);
   console.log(`📱 Environment: ${process.env.NODE_ENV}`);
   console.log(`🔗 Local URL: http://localhost:${PORT}`);
+  
+  // Initialize Stripe products and prices
+  if (process.env.STRIPE_SECRET_KEY) {
+    try {
+      const { initializeStripeProducts } = require('./services/stripe');
+      await initializeStripeProducts();
+      console.log('💳 Stripe products initialized');
+    } catch (error) {
+      console.error('❌ Stripe initialization failed:', error.message);
+    }
+  } else {
+    console.log('⚠️  Stripe not configured (missing STRIPE_SECRET_KEY)');
+  }
   
   if (process.env.NODE_ENV === 'development') {
     console.log('\n📋 Available routes:');

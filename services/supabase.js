@@ -77,11 +77,12 @@ async function updateUserProfile(userId, updateData) {
 // Helper function to save user goals
 async function saveUserGoals(userId, userType, goalData) {
   try {
-    // First, try to find existing goals for this user
+    // First, try to find existing goals for this user and type
     const { data: existing } = await supabaseAdmin
       .from('user_goals')
       .select('id')
       .eq('user_id', userId)
+      .eq('user_type', userType)
       .single();
 
     let result;
@@ -95,6 +96,7 @@ async function saveUserGoals(userId, userType, goalData) {
           updated_at: new Date().toISOString()
         })
         .eq('user_id', userId)
+        .eq('user_type', userType)
         .select()
         .single();
     } else {
@@ -118,13 +120,19 @@ async function saveUserGoals(userId, userType, goalData) {
 }
 
 // Helper function to get user goals
-async function getUserGoals(userId) {
+async function getUserGoals(userId, userType = null) {
   try {
-    const { data, error } = await supabaseAdmin
+    let query = supabaseAdmin
       .from('user_goals')
       .select('*')
-      .eq('user_id', userId)
-      .single();
+      .eq('user_id', userId);
+    
+    // Add userType filter if provided
+    if (userType && (userType === 'broker' || userType === 'investor')) {
+      query = query.eq('user_type', userType);
+    }
+    
+    const { data, error } = await query.single();
     
     return { data, error };
   } catch (error) {
@@ -141,6 +149,7 @@ async function saveDailyActivity(userId, activityData) {
       .upsert([{
         user_id: userId,
         activity_date: activityData.date,
+        user_type: activityData.userType || 'broker', // Include user_type
         attempts: activityData.attempts,
         contacts: activityData.contacts,
         appointments: activityData.appointments,
@@ -148,7 +157,7 @@ async function saveDailyActivity(userId, activityData) {
         closings: activityData.closings,
         updated_at: new Date().toISOString()
       }], {
-        onConflict: 'user_id,activity_date'
+        onConflict: 'user_id,user_type,activity_date' // Updated conflict resolution
       })
       .select()
       .single();
@@ -161,12 +170,19 @@ async function saveDailyActivity(userId, activityData) {
 }
 
 // Helper function to get user activities
-async function getUserActivities(userId, limit = 100) {
+async function getUserActivities(userId, limit = 100, userType = null) {
   try {
-    const { data, error } = await supabaseAdmin
+    let query = supabaseAdmin
       .from('daily_activities')
       .select('*')
-      .eq('user_id', userId)
+      .eq('user_id', userId);
+    
+    // Add userType filter if provided
+    if (userType && (userType === 'broker' || userType === 'investor')) {
+      query = query.eq('user_type', userType);
+    }
+    
+    const { data, error } = await query
       .order('activity_date', { ascending: false })
       .limit(limit);
     

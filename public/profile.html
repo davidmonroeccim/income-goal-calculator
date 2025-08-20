@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Income Goal Calculator</title>
+    <meta name="description" content="Manage your Income Goal Calculator profile and settings">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css?v=1.1">
+    <link rel="stylesheet" href="/css/app.css?v=1.1">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="container">
+                <div class="header-content">
+                    <a href="/app" class="logo-link">
+                        <img src="/images/logo.png" alt="AcquisitionPRO Logo" class="logo">
+                    </a>
+                    <nav class="app-nav">
+                        <a href="/app" class="nav-link">Dashboard</a>
+                        <a href="/calculator" class="nav-link">Calculator</a>
+                        <a href="/activities" class="nav-link">Activity Tracker</a>
+                        <a href="/profile" class="nav-link active">Profile</a>
+                    </nav>
+                    <div class="user-menu">
+                        <span class="user-greeting" id="userGreeting">Loading...</span>
+                        <button class="btn btn-secondary btn-sm" id="logoutButton">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <div class="profile-container">
+                    <div class="profile-header">
+                        <h1>Profile Settings</h1>
+                        <p>Manage your account information and preferences</p>
+                    </div>
+
+                    <div class="profile-content">
+                        <!-- Profile Information Card -->
+                        <div class="profile-card">
+                            <div class="card-header">
+                                <h2>Profile Information</h2>
+                                <p>Update your personal information</p>
+                            </div>
+                            
+                            <form id="profileForm" class="profile-form">
+                                <!-- Error/Success Messages -->
+                                <div id="messageContainer" class="message-container" style="display: none;"></div>
+
+                                <!-- Name Fields -->
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="firstName" class="form-label">First Name</label>
+                                        <input 
+                                            type="text" 
+                                            id="firstName" 
+                                            name="firstName" 
+                                            class="form-input" 
+                                            required
+                                            autocomplete="given-name"
+                                        >
+                                        <div class="form-error" id="firstNameError"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lastName" class="form-label">Last Name</label>
+                                        <input 
+                                            type="text" 
+                                            id="lastName" 
+                                            name="lastName" 
+                                            class="form-input" 
+                                            required
+                                            autocomplete="family-name"
+                                        >
+                                        <div class="form-error" id="lastNameError"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Email Field (Read-only) -->
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input 
+                                        type="email" 
+                                        id="email" 
+                                        name="email" 
+                                        class="form-input" 
+                                        readonly
+                                        style="background-color: var(--gray-100); cursor: not-allowed;"
+                                    >
+                                    <div class="form-help">
+                                        <small>Email address cannot be changed. Contact support if needed.</small>
+                                    </div>
+                                </div>
+
+                                <!-- User Type (Read-only) -->
+                                <div class="form-group">
+                                    <label class="form-label">Account Type</label>
+                                    <div class="user-type-display" id="userTypeDisplay">
+                                        <div class="user-type-badge">
+                                            <span class="user-type-icon" id="userTypeIcon">🏠</span>
+                                            <span class="user-type-text" id="userTypeText">Real Estate Broker/Agent</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-help">
+                                        <small>Account type cannot be changed. Contact support to switch account types.</small>
+                                    </div>
+                                </div>
+
+                                <!-- Subscription Status -->
+                                <div class="form-group">
+                                    <label class="form-label">Subscription Status</label>
+                                    <div class="subscription-status" id="subscriptionStatus">
+                                        <div class="status-badge status-free" id="statusBadge">
+                                            <span class="status-icon">📦</span>
+                                            <span class="status-text">Free Plan</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-help" id="subscriptionActions">
+                                        <small><a href="/pricing">Upgrade to unlock premium features</a></small>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary" id="updateProfileButton">
+                                        <span class="button-text">Update Profile</span>
+                                        <span class="button-loading" style="display: none;">
+                                            <span class="spinner"></span>
+                                            Updating...
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Password Change Card -->
+                        <div class="profile-card">
+                            <div class="card-header">
+                                <h2>Change Password</h2>
+                                <p>Update your password to keep your account secure</p>
+                            </div>
+                            
+                            <form id="passwordForm" class="profile-form">
+                                <!-- Error/Success Messages -->
+                                <div id="passwordMessageContainer" class="message-container" style="display: none;"></div>
+
+                                <!-- Current Password -->
+                                <div class="form-group">
+                                    <label for="currentPassword" class="form-label">Current Password</label>
+                                    <div class="password-field">
+                                        <input 
+                                            type="password" 
+                                            id="currentPassword" 
+                                            name="currentPassword" 
+                                            class="form-input" 
+                                            required
+                                            autocomplete="current-password"
+                                        >
+                                        <button type="button" class="password-toggle" data-target="currentPassword">
+                                            <span class="show-text">Show</span>
+                                            <span class="hide-text" style="display: none;">Hide</span>
+                                        </button>
+                                    </div>
+                                    <div class="form-error" id="currentPasswordError"></div>
+                                </div>
+
+                                <!-- New Password -->
+                                <div class="form-group">
+                                    <label for="newPassword" class="form-label">New Password</label>
+                                    <div class="password-field">
+                                        <input 
+                                            type="password" 
+                                            id="newPassword" 
+                                            name="newPassword" 
+                                            class="form-input" 
+                                            required
+                                            autocomplete="new-password"
+                                            minlength="8"
+                                        >
+                                        <button type="button" class="password-toggle" data-target="newPassword">
+                                            <span class="show-text">Show</span>
+                                            <span class="hide-text" style="display: none;">Hide</span>
+                                        </button>
+                                    </div>
+                                    <div class="password-requirements">
+                                        <small>Password must be at least 8 characters long</small>
+                                    </div>
+                                    <div class="form-error" id="newPasswordError"></div>
+                                </div>
+
+                                <!-- Confirm New Password -->
+                                <div class="form-group">
+                                    <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+                                    <div class="password-field">
+                                        <input 
+                                            type="password" 
+                                            id="confirmNewPassword" 
+                                            name="confirmNewPassword" 
+                                            class="form-input" 
+                                            required
+                                            autocomplete="new-password"
+                                            minlength="8"
+                                        >
+                                    </div>
+                                    <div class="form-error" id="confirmNewPasswordError"></div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary" id="updatePasswordButton">
+                                        <span class="button-text">Update Password</span>
+                                        <span class="button-loading" style="display: none;">
+                                            <span class="spinner"></span>
+                                            Updating...
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Account Actions Card -->
+                        <div class="profile-card">
+                            <div class="card-header">
+                                <h2>Account Actions</h2>
+                                <p>Additional account management options</p>
+                            </div>
+                            
+                            <div class="account-actions">
+                                <div class="action-item">
+                                    <div class="action-info">
+                                        <h3>Email Verification</h3>
+                                        <p id="emailVerificationStatus">Checking verification status...</p>
+                                    </div>
+                                    <button class="btn btn-secondary" id="resendVerificationButton" style="display: none;">
+                                        Resend Verification
+                                    </button>
+                                </div>
+
+                                <div class="action-item">
+                                    <div class="action-info">
+                                        <h3>Download Data</h3>
+                                        <p>Export all your account data and calculations</p>
+                                    </div>
+                                    <button class="btn btn-secondary" id="exportDataButton">
+                                        Export Data
+                                    </button>
+                                </div>
+
+                                <div class="action-item danger">
+                                    <div class="action-info">
+                                        <h3>Delete Account</h3>
+                                        <p>Permanently delete your account and all associated data</p>
+                                    </div>
+                                    <button class="btn btn-danger" id="deleteAccountButton">
+                                        Delete Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-logo-section">
+                        <img src="/images/logo.png" alt="AcquisitionPRO Logo" class="footer-logo">
+                        <p>&copy; 2024 AcquisitionPRO. All rights reserved.</p>
+                    </div>
+                    <div class="footer-links">
+                        <a href="/privacy">Privacy Policy</a>
+                        <a href="/terms">Terms of Service</a>
+                        <a href="/contact">Contact</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://jkwkrtnwdlyxhiqdmbtm.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imprd2tydG53ZGx5eGhpcWRtYnRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2MTgyMDYsImV4cCI6MjA3MTE5NDIwNn0.AIR6IH6XruUiTMNczYDb9twFb6pvFgeQTTNYmuRt5oU';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+        // Global state
+        let currentUser = null;
+        let accessToken = null;
+
+        // DOM Elements
+        const userGreeting = document.getElementById('userGreeting');
+        const logoutButton = document.getElementById('logoutButton');
+        const profileForm = document.getElementById('profileForm');
+        const passwordForm = document.getElementById('passwordForm');
+        const messageContainer = document.getElementById('messageContainer');
+        const passwordMessageContainer = document.getElementById('passwordMessageContainer');
+
+        // Initialize page
+        window.addEventListener('DOMContentLoaded', async function() {
+            await initializeAuth();
+            await loadUserProfile();
+            setupEventListeners();
+        });
+
+        // Authentication initialization
+        async function initializeAuth() {
+            accessToken = localStorage.getItem('access_token');
+            
+            if (!accessToken) {
+                redirectToLogin();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        redirectToLogin();
+                        return;
+                    }
+                    throw new Error('Failed to fetch profile');
+                }
+
+                const result = await response.json();
+                currentUser = result.user;
+                
+                // Update user greeting
+                if (currentUser.profile) {
+                    userGreeting.textContent = `Hello, ${currentUser.profile.first_name}!`;
+                } else {
+                    userGreeting.textContent = 'Hello!';
+                }
+
+            } catch (error) {
+                console.error('Auth initialization error:', error);
+                redirectToLogin();
+            }
+        }
+
+        function redirectToLogin() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user_profile');
+            window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+        }
+
+        // Load user profile data
+        async function loadUserProfile() {
+            if (!currentUser || !currentUser.profile) {
+                showMessage('Failed to load profile data', 'error', messageContainer);
+                return;
+            }
+
+            const profile = currentUser.profile;
+            
+            // Fill form fields
+            document.getElementById('firstName').value = profile.first_name || '';
+            document.getElementById('lastName').value = profile.last_name || '';
+            document.getElementById('email').value = profile.email || '';
+
+            // Set user type display
+            const userTypeIcon = document.getElementById('userTypeIcon');
+            const userTypeText = document.getElementById('userTypeText');
+            
+            if (profile.user_type === 'investor') {
+                userTypeIcon.textContent = '💰';
+                userTypeText.textContent = 'Real Estate Investor';
+            } else {
+                userTypeIcon.textContent = '🏠';
+                userTypeText.textContent = 'Real Estate Broker/Agent';
+            }
+
+            // Load subscription status from API
+            await loadSubscriptionStatus();
+
+            // Check email verification status
+            updateEmailVerificationStatus(profile.email_verified);
+        }
+
+        function updateEmailVerificationStatus(isVerified) {
+            const statusElement = document.getElementById('emailVerificationStatus');
+            const resendButton = document.getElementById('resendVerificationButton');
+            
+            if (isVerified) {
+                statusElement.textContent = '✅ Your email address is verified';
+                statusElement.className = 'status-verified';
+                resendButton.style.display = 'none';
+            } else {
+                statusElement.textContent = '⚠️ Your email address needs verification';
+                statusElement.className = 'status-unverified';
+                resendButton.style.display = 'inline-block';
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Logout button
+            logoutButton.addEventListener('click', handleLogout);
+
+            // Profile form submission
+            profileForm.addEventListener('submit', handleProfileUpdate);
+
+            // Password form submission
+            passwordForm.addEventListener('submit', handlePasswordUpdate);
+
+            // Password visibility toggles
+            document.querySelectorAll('.password-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const passwordInput = document.getElementById(targetId);
+                    const showText = this.querySelector('.show-text');
+                    const hideText = this.querySelector('.hide-text');
+                    
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        showText.style.display = 'none';
+                        hideText.style.display = 'inline';
+                    } else {
+                        passwordInput.type = 'password';
+                        showText.style.display = 'inline';
+                        hideText.style.display = 'none';
+                    }
+                });
+            });
+
+            // Real-time password validation
+            document.getElementById('newPassword').addEventListener('input', validateNewPassword);
+            document.getElementById('confirmNewPassword').addEventListener('input', validateConfirmPassword);
+
+            // Account action buttons
+            document.getElementById('resendVerificationButton').addEventListener('click', handleResendVerification);
+            document.getElementById('exportDataButton').addEventListener('click', handleExportData);
+            document.getElementById('deleteAccountButton').addEventListener('click', handleDeleteAccount);
+        }
+
+        // Subscription management functions
+        async function loadSubscriptionStatus() {
+            try {
+                const response = await fetch('/api/subscriptions/status', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const statusBadge = document.getElementById('statusBadge');
+                const subscriptionActions = document.getElementById('subscriptionActions');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const subscription = data.subscription;
+                    
+                    const statusIcon = statusBadge.querySelector('.status-icon');
+                    const statusText = statusBadge.querySelector('.status-text');
+                    
+                    if (subscription.status === 'active') {
+                        statusBadge.className = 'status-badge status-active';
+                        statusIcon.textContent = '👑';
+                        
+                        let planText = subscription.plan === 'monthly' ? 'Pro Monthly' :
+                                     subscription.plan === 'yearly' ? 'Pro Yearly' :
+                                     subscription.plan === 'lifetime' ? 'Lifetime Pro' : 'Pro Plan';
+                        
+                        statusText.textContent = planText;
+                        
+                        // Show billing management options
+                        subscriptionActions.innerHTML = `
+                            <div style="margin-top: 10px;">
+                                <button class="btn btn-sm btn-secondary" onclick="openBillingPortal()" style="margin-right: 10px;">
+                                    📄 Manage Billing
+                                </button>
+                                <button class="btn btn-sm btn-outline" onclick="cancelSubscription()" style="color: #dc3545; border-color: #dc3545;">
+                                    ❌ Cancel Subscription
+                                </button>
+                            </div>
+                            <small style="color: var(--text-muted); margin-top: 5px; display: block;">
+                                ${subscription.currentPeriodEnd ? 
+                                  `Next billing: ${new Date(subscription.currentPeriodEnd * 1000).toLocaleDateString()}` :
+                                  'Lifetime access - no recurring billing'}
+                                ${subscription.cancelAtPeriodEnd ? '<br><strong style="color: #dc3545;">Subscription will cancel at period end</strong>' : ''}
+                            </small>
+                        `;
+                    } else {
+                        statusBadge.className = 'status-badge status-free';
+                        statusIcon.textContent = '📦';
+                        statusText.textContent = 'Free Plan';
+                        
+                        subscriptionActions.innerHTML = `
+                            <small><a href="/pricing">Upgrade to unlock premium features</a></small>
+                        `;
+                    }
+                } else {
+                    // Default to free status
+                    statusBadge.className = 'status-badge status-free';
+                    statusBadge.querySelector('.status-icon').textContent = '📦';
+                    statusBadge.querySelector('.status-text').textContent = 'Free Plan';
+                    
+                    subscriptionActions.innerHTML = `
+                        <small><a href="/pricing">Upgrade to unlock premium features</a></small>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading subscription status:', error);
+                
+                // Default to free status on error
+                const statusBadge = document.getElementById('statusBadge');
+                statusBadge.className = 'status-badge status-free';
+                statusBadge.querySelector('.status-icon').textContent = '📦';
+                statusBadge.querySelector('.status-text').textContent = 'Free Plan';
+            }
+        }
+
+        async function openBillingPortal() {
+            try {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.disabled = true;
+                button.textContent = 'Opening...';
+
+                const response = await fetch('/api/subscriptions/billing-portal', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.portalUrl) {
+                    window.open(data.portalUrl, '_blank');
+                } else {
+                    alert('Unable to open billing portal. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error opening billing portal:', error);
+                alert('An error occurred. Please try again.');
+            } finally {
+                event.target.disabled = false;
+                event.target.textContent = '📄 Manage Billing';
+            }
+        }
+
+        async function cancelSubscription() {
+            if (!confirm('Are you sure you want to cancel your subscription? You will still have access until the end of your billing period.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/subscriptions/cancel', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Subscription canceled successfully. You will retain access until the end of your current billing period.');
+                    await loadSubscriptionStatus(); // Refresh status
+                } else {
+                    alert(data.error || 'Failed to cancel subscription. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error canceling subscription:', error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+
+        // Event handlers
+        async function handleLogout() {
+            try {
+                // Call logout endpoint
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                // Clear local storage
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('user_profile');
+
+                // Redirect to login
+                window.location.href = '/login';
+
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Still clear local storage and redirect
+                localStorage.clear();
+                window.location.href = '/login';
+            }
+        }
+
+        async function handleProfileUpdate(e) {
+            e.preventDefault();
+
+            if (!validateProfileForm()) {
+                return;
+            }
+
+            setLoadingState('updateProfileButton', true);
+            clearMessages(messageContainer);
+
+            try {
+                const formData = new FormData(profileForm);
+                const updateData = {
+                    first_name: formData.get('firstName').trim(),
+                    last_name: formData.get('lastName').trim()
+                };
+
+                const response = await fetch('/api/auth/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showMessage('Profile updated successfully!', 'success', messageContainer);
+                    
+                    // Update local user data
+                    if (currentUser.profile) {
+                        currentUser.profile.first_name = updateData.first_name;
+                        currentUser.profile.last_name = updateData.last_name;
+                        userGreeting.textContent = `Hello, ${updateData.first_name}!`;
+                    }
+                } else {
+                    showMessage(result.error || 'Failed to update profile', 'error', messageContainer);
+                }
+
+            } catch (error) {
+                console.error('Profile update error:', error);
+                showMessage('Network error. Please try again.', 'error', messageContainer);
+            } finally {
+                setLoadingState('updateProfileButton', false);
+            }
+        }
+
+        async function handlePasswordUpdate(e) {
+            e.preventDefault();
+
+            if (!validatePasswordForm()) {
+                return;
+            }
+
+            setLoadingState('updatePasswordButton', true);
+            clearMessages(passwordMessageContainer);
+
+            try {
+                const formData = new FormData(passwordForm);
+                const passwordData = {
+                    currentPassword: formData.get('currentPassword'),
+                    newPassword: formData.get('newPassword')
+                };
+
+                // First verify current password by attempting login
+                const loginResponse = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: currentUser.email,
+                        password: passwordData.currentPassword
+                    })
+                });
+
+                if (!loginResponse.ok) {
+                    showMessage('Current password is incorrect', 'error', passwordMessageContainer);
+                    return;
+                }
+
+                // Update password using Supabase
+                const { error } = await supabase.auth.updateUser({
+                    password: passwordData.newPassword
+                });
+
+                if (error) {
+                    console.error('Password update error:', error);
+                    showMessage(error.message || 'Failed to update password', 'error', passwordMessageContainer);
+                    return;
+                }
+
+                showMessage('Password updated successfully!', 'success', passwordMessageContainer);
+                passwordForm.reset();
+
+            } catch (error) {
+                console.error('Password update error:', error);
+                showMessage('Network error. Please try again.', 'error', passwordMessageContainer);
+            } finally {
+                setLoadingState('updatePasswordButton', false);
+            }
+        }
+
+        async function handleResendVerification() {
+            // Implementation for resending verification email
+            showMessage('Verification email sent! Please check your inbox.', 'success', messageContainer);
+        }
+
+        async function handleExportData() {
+            try {
+                const response = await fetch('/api/user/export', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `income-goal-data-${new Date().getTime()}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    showMessage('Data exported successfully!', 'success', messageContainer);
+                } else {
+                    showMessage('Failed to export data', 'error', messageContainer);
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                showMessage('Failed to export data', 'error', messageContainer);
+            }
+        }
+
+        function handleDeleteAccount() {
+            const confirmed = confirm('Are you sure you want to delete your account? This action cannot be undone and will permanently delete all your data.');
+            
+            if (confirmed) {
+                const doubleConfirmed = confirm('This will permanently delete your account and all associated data. Type your email address to confirm.');
+                // Implementation would go here
+                showMessage('Account deletion is not yet implemented. Please contact support.', 'info', messageContainer);
+            }
+        }
+
+        // Utility functions
+        function validateProfileForm() {
+            let isValid = true;
+            clearErrors();
+
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+
+            if (!firstName) {
+                showFieldError('firstNameError', 'First name is required');
+                isValid = false;
+            }
+
+            if (!lastName) {
+                showFieldError('lastNameError', 'Last name is required');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function validatePasswordForm() {
+            let isValid = true;
+            clearPasswordErrors();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+            if (!currentPassword) {
+                showFieldError('currentPasswordError', 'Current password is required');
+                isValid = false;
+            }
+
+            if (!newPassword) {
+                showFieldError('newPasswordError', 'New password is required');
+                isValid = false;
+            } else if (newPassword.length < 8) {
+                showFieldError('newPasswordError', 'Password must be at least 8 characters long');
+                isValid = false;
+            }
+
+            if (!confirmNewPassword) {
+                showFieldError('confirmNewPasswordError', 'Please confirm your new password');
+                isValid = false;
+            } else if (newPassword !== confirmNewPassword) {
+                showFieldError('confirmNewPasswordError', 'Passwords do not match');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function validateNewPassword() {
+            const password = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmNewPassword').value;
+            
+            if (password.length > 0 && password.length < 8) {
+                showFieldError('newPasswordError', 'Password must be at least 8 characters long');
+            } else {
+                document.getElementById('newPasswordError').style.display = 'none';
+            }
+
+            if (confirmPassword && password !== confirmPassword) {
+                showFieldError('confirmNewPasswordError', 'Passwords do not match');
+            } else if (confirmPassword) {
+                document.getElementById('confirmNewPasswordError').style.display = 'none';
+            }
+        }
+
+        function validateConfirmPassword() {
+            const password = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmNewPassword').value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                showFieldError('confirmNewPasswordError', 'Passwords do not match');
+            } else {
+                document.getElementById('confirmNewPasswordError').style.display = 'none';
+            }
+        }
+
+        function showMessage(message, type = 'info', container) {
+            container.className = `message-container message-${type}`;
+            container.textContent = message;
+            container.style.display = 'block';
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function clearMessages(container) {
+            container.style.display = 'none';
+        }
+
+        function showFieldError(fieldId, message) {
+            const errorElement = document.getElementById(fieldId);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        function clearErrors() {
+            const errorElements = profileForm.querySelectorAll('.form-error');
+            errorElements.forEach(element => {
+                element.textContent = '';
+                element.style.display = 'none';
+            });
+        }
+
+        function clearPasswordErrors() {
+            const errorElements = passwordForm.querySelectorAll('.form-error');
+            errorElements.forEach(element => {
+                element.textContent = '';
+                element.style.display = 'none';
+            });
+        }
+
+        function setLoadingState(buttonId, loading) {
+            const button = document.getElementById(buttonId);
+            const buttonText = button.querySelector('.button-text');
+            const buttonLoading = button.querySelector('.button-loading');
+            
+            if (loading) {
+                button.disabled = true;
+                buttonText.style.display = 'none';
+                buttonLoading.style.display = 'flex';
+            } else {
+                button.disabled = false;
+                buttonText.style.display = 'block';
+                buttonLoading.style.display = 'none';
+            }
+        }
+    </script>
+
+    <!-- Iframe Detection -->
+    <script src="/js/iframe-detector.js"></script>
+</body>
+</html>

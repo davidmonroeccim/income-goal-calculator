@@ -16,6 +16,9 @@
   --yellow-light: #FFFD33;
   --yellow-dark: #E6E300;
   
+  /* Brand Gradients */
+  --bg-brand-gradient: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-blue) 100%);
+  
   /* Neutral Colors */
   --white: #FFFFFF;
   --gray-50: #F8F9FA;

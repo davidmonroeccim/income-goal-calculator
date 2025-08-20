@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Tracking - Income Goal Calculator</title>
+    <meta name="description" content="Track your daily CRE prospecting activities and monitor progress">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css?v=1.1">
+    <link rel="stylesheet" href="/css/app.css?v=1.1">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="container">
+                <div class="header-content">
+                    <a href="/app" class="logo-link">
+                        <img src="/images/logo.png" alt="AcquisitionPRO Logo" class="logo">
+                    </a>
+                    <nav class="app-nav">
+                        <a href="/app" class="nav-link">Dashboard</a>
+                        <a href="/calculator" class="nav-link">Calculator</a>
+                        <a href="/activities" class="nav-link active">Activity Tracker</a>
+                        <a href="/profile" class="nav-link">Profile</a>
+                    </nav>
+                    <div class="user-menu">
+                        <span class="user-greeting" id="userGreeting">Loading...</span>
+                        <button class="btn btn-secondary btn-sm" id="logoutButton">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content" style="min-height: calc(100vh - 200px); padding-top: var(--spacing-lg);">
+            <div class="container" style="max-width: 1400px;">
+                <!-- Activity Tracker Container -->
+                <div class="activity-tracker-container">
+                    <!-- Header -->
+                    <div class="activity-header">
+                        <h1>Daily Activity Tracker</h1>
+                        <p>Track your daily prospecting activities and monitor your progress toward your goals</p>
+                    </div>
+
+                    <!-- Activity Type Toggle -->
+                    <div class="user-type-toggle" id="activityTypeToggle">
+                        <div class="toggle-buttons">
+                            <button class="toggle-btn active" data-type="broker" id="brokerActivityToggle">
+                                🏠 Broker Activities
+                            </button>
+                            <button class="toggle-btn" data-type="investor" id="investorActivityToggle">
+                                💰 Investor Activities
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Premium Feature Notice -->
+                    <div class="premium-notice" id="premiumNotice">
+                        <div class="notice-content">
+                            <div class="notice-icon">💎</div>
+                            <div class="notice-text">
+                                <h3>Premium Feature</h3>
+                                <p>Activity tracking is a premium feature. Upgrade to Pro to track your daily activities and monitor your progress.</p>
+                            </div>
+                            <button class="btn btn-primary" id="upgradeToProBtn">Upgrade to Pro</button>
+                        </div>
+                    </div>
+
+                    <!-- Activity Content (Hidden for non-premium users) -->
+                    <div class="activity-content" id="activityContent" style="display: none;">
+                        <div class="activity-grid">
+                            <!-- Daily Activity Form -->
+                            <div class="activity-form-panel">
+                                <div class="panel-title">Today's Activities</div>
+                                
+                                <form id="dailyActivityForm">
+                                    <div class="form-group">
+                                        <label for="activityDate">Date</label>
+                                        <input type="date" id="activityDate" required>
+                                    </div>
+
+                                    <div class="form-section">
+                                        <div class="section-title">Daily Numbers</div>
+                                        
+                                        <div class="form-group">
+                                            <label for="attempts">Total Attempts Made</label>
+                                            <input type="number" id="attempts" min="0" value="0">
+                                            <small class="form-help">Phone calls, emails, door knocks, etc.</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="contacts">Decision Makers Reached</label>
+                                            <input type="number" id="contacts" min="0" value="0">
+                                            <small class="form-help">Actual conversations with decision makers</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="appointments">First Appointments Set</label>
+                                            <input type="number" id="appointments" min="0" value="0">
+                                            <small class="form-help">New appointments scheduled</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="contracts">Contracts Signed</label>
+                                            <input type="number" id="contracts" min="0" value="0">
+                                            <small class="form-help">New contracts or agreements signed</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="closings">Closings Completed</label>
+                                            <input type="number" id="closings" min="0" value="0">
+                                            <small class="form-help">Transactions that closed today</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">Save Today's Activity</button>
+                                        <button type="button" class="btn btn-secondary" id="clearFormBtn">Clear Form</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Progress Panel -->
+                            <div class="progress-panel">
+                                <div class="panel-title">Progress Against Goals</div>
+                                
+                                <!-- Performance Dashboard -->
+                                <div id="performanceDashboard" class="performance-dashboard">
+                                    <div class="dashboard-grid">
+                                        <!-- Daily Attempts -->
+                                        <div class="metric-card">
+                                            <div class="metric-title">Daily Attempts</div>
+                                            <div class="metric-value" id="dailyAttempts">0</div>
+                                            <div class="metric-target">Target: <span id="dailyAttemptsTarget">-</span></div>
+                                            <div class="metric-progress">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" id="dailyAttemptsProgress"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Total Contacts -->
+                                        <div class="metric-card">
+                                            <div class="metric-title">Total Contacts</div>
+                                            <div class="metric-value" id="totalContacts">0</div>
+                                            <div class="metric-target">Target: <span id="totalContactsTarget">-</span></div>
+                                            <div class="metric-progress">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" id="totalContactsProgress"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Total Appointments -->
+                                        <div class="metric-card">
+                                            <div class="metric-title">Total Appointments</div>
+                                            <div class="metric-value" id="totalAppointments">0</div>
+                                            <div class="metric-target">Target: <span id="totalAppointmentsTarget">-</span></div>
+                                            <div class="metric-progress">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" id="totalAppointmentsProgress"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Total Contracts -->
+                                        <div class="metric-card">
+                                            <div class="metric-title">Total Contracts</div>
+                                            <div class="metric-value" id="totalContracts">0</div>
+                                            <div class="metric-target">Target: <span id="totalContractsTarget">-</span></div>
+                                            <div class="metric-progress">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" id="totalContractsProgress"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Total Closings -->
+                                        <div class="metric-card">
+                                            <div class="metric-title">Total Closings</div>
+                                            <div class="metric-value" id="totalClosings">0</div>
+                                            <div class="metric-target">Target: <span id="totalClosingsTarget">-</span></div>
+                                            <div class="metric-progress">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" id="totalClosingsProgress"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Commission Progress -->
+                                        <div class="metric-card commission-card">
+                                            <div class="metric-title">Commission Progress</div>
+                                            <div class="metric-value commission-value" id="commissionProgress">$0</div>
+                                            <div class="metric-target">Target: <span id="commissionTarget">$-</span></div>
+                                            <div class="metric-progress">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" id="commissionProgressBar"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- No Goals Message -->
+                                    <div id="noGoalsMessage" class="no-goals-message" style="display: none;">
+                                        <p>No goals found. <a href="/calculator">Calculate your goals first</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activities -->
+                        <div class="recent-activities">
+                            <div class="section-header">
+                                <h2>Recent Activity</h2>
+                                <div class="activity-filters">
+                                    <button class="filter-btn active" data-period="7">Last 7 Days</button>
+                                    <button class="filter-btn" data-period="30">Last 30 Days</button>
+                                    <button class="filter-btn" data-period="90">Last 90 Days</button>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-list" id="activityList">
+                                <p class="no-activities-message">No activities recorded yet. Add your first activity above!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-logo-section">
+                        <img src="/images/logo.png" alt="AcquisitionPRO Logo" class="footer-logo">
+                        <p>&copy; 2024 AcquisitionPRO. All rights reserved.</p>
+                    </div>
+                    <div class="footer-links">
+                        <a href="/privacy">Privacy Policy</a>
+                        <a href="/terms">Terms of Service</a>
+                        <a href="/contact">Contact</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Upgrade Modal -->
+    <div class="modal-overlay" id="upgradeModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Upgrade to Premium</h3>
+                <button class="modal-close" id="closeUpgradeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upgrade-features">
+                    <h4>Premium Features Include:</h4>
+                    <ul>
+                        <li>✅ Daily Activity Tracking</li>
+                        <li>✅ Progress Monitoring & Analytics</li>
+                        <li>✅ Goal vs. Actual Performance Reports</li>
+                        <li>✅ Historical Activity Data</li>
+                        <li>✅ Conversion Rate Analysis</li>
+                        <li>✅ Data Export Capabilities</li>
+                    </ul>
+                    <div class="pricing-info">
+                        <div class="price">Starting at $19/month</div>
+                        <p>Annual plan available for $189/year (save $39!)<br>
+                        Lifetime access for $297. 30-day money back guarantee.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="upgradeNowBtn">Upgrade Now</button>
+                <button class="btn btn-secondary" id="maybeLaterBtn">Maybe Later</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://jkwkrtnwdlyxhiqdmbtm.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imprd2tydG53ZGx5eGhpcWRtYnRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2MTgyMDYsImV4cCI6MjA3MTE5NDIwNn0.AIR6IH6XruUiTMNczYDb9twFb6pvFgeQTTNYmuRt5oU';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+        // Global variables
+        let currentUser = null;
+        let accessToken = null;
+        let userGoals = null;
+        let isPremiumUser = false;
+        let currentActivityRole = 'broker'; // Default role
+        let brokerGoals = null;
+        let investorGoals = null;
+
+        // DOM Elements
+        const userGreeting = document.getElementById('userGreeting');
+        const logoutButton = document.getElementById('logoutButton');
+        const activityForm = document.getElementById('dailyActivityForm');
+        const activityDateInput = document.getElementById('activityDate');
+
+        // Initialize page
+        window.addEventListener('DOMContentLoaded', async function() {
+            await initializeAuth();
+            setupEventListeners();
+            await loadUserGoals();
+            await checkPremiumStatus();
+            if (isPremiumUser) {
+                showActivityContent();
+                await loadRecentActivities();
+                await updateQuickStats();
+            }
+            setTodaysDate();
+        });
+
+        // Authentication initialization
+        async function initializeAuth() {
+            accessToken = localStorage.getItem('access_token');
+            
+            if (!accessToken) {
+                redirectToLogin();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        redirectToLogin();
+                        return;
+                    }
+                    throw new Error('Failed to fetch profile');
+                }
+
+                const result = await response.json();
+                currentUser = result.user;
+                
+                // Update user greeting
+                if (currentUser.profile) {
+                    userGreeting.textContent = `Hello, ${currentUser.profile.first_name}!`;
+                } else {
+                    userGreeting.textContent = 'Hello!';
+                }
+
+            } catch (error) {
+                console.error('Auth initialization error:', error);
+                redirectToLogin();
+            }
+        }
+
+        function redirectToLogin() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user_profile');
+            window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Logout button
+            logoutButton.addEventListener('click', handleLogout);
+
+            // Activity form
+            activityForm.addEventListener('submit', handleActivitySubmit);
+
+            // Activity role toggle buttons
+            const brokerActivityToggle = document.getElementById('brokerActivityToggle');
+            const investorActivityToggle = document.getElementById('investorActivityToggle');
+            
+            if (brokerActivityToggle && investorActivityToggle) {
+                brokerActivityToggle.addEventListener('click', () => switchActivityRole('broker'));
+                investorActivityToggle.addEventListener('click', () => switchActivityRole('investor'));
+            }
+
+            // Filter buttons
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    loadRecentActivities(parseInt(this.dataset.period));
+                });
+            });
+
+            // Modal event listeners
+            const upgradeToProBtn = document.getElementById('upgradeToProBtn');
+            const closeUpgradeModalBtn = document.getElementById('closeUpgradeModalBtn');
+            const upgradeNowBtn = document.getElementById('upgradeNowBtn');
+            const maybeLaterBtn = document.getElementById('maybeLaterBtn');
+            const clearFormBtn = document.getElementById('clearFormBtn');
+
+            if (upgradeToProBtn) {
+                upgradeToProBtn.addEventListener('click', showUpgradeModal);
+            }
+            if (closeUpgradeModalBtn) {
+                closeUpgradeModalBtn.addEventListener('click', closeUpgradeModal);
+            }
+            if (upgradeNowBtn) {
+                upgradeNowBtn.addEventListener('click', initiateUpgrade);
+            }
+            if (maybeLaterBtn) {
+                maybeLaterBtn.addEventListener('click', closeUpgradeModal);
+            }
+            if (clearFormBtn) {
+                clearFormBtn.addEventListener('click', clearForm);
+            }
+        }
+
+        // Set today's date as default
+        function setTodaysDate() {
+            const today = new Date().toISOString().split('T')[0];
+            activityDateInput.value = today;
+        }
+
+        // Switch activity role (broker/investor)
+        function switchActivityRole(role) {
+            currentActivityRole = role;
+            
+            // Update toggle buttons
+            const brokerToggle = document.getElementById('brokerActivityToggle');
+            const investorToggle = document.getElementById('investorActivityToggle');
+            
+            brokerToggle.classList.toggle('active', role === 'broker');
+            investorToggle.classList.toggle('active', role === 'investor');
+            
+            // Save user preference
+            if (currentUser) {
+                localStorage.setItem('preferredActivityRole', role);
+                saveUserActivityRolePreference(role);
+            }
+            
+            // Reload activities for the selected role
+            if (isPremiumUser) {
+                displayGoalsComparison();
+                loadRecentActivities();
+                updateQuickStats();
+            }
+        }
+
+        // Check premium status with Stripe subscription integration
+        async function checkPremiumStatus() {
+            console.log('🚀 Starting premium status check...');
+            try {
+                const token = localStorage.getItem('access_token');
+                console.log('🔑 Token check:', token ? '✅ Token found' : '❌ No token');
+                if (!token) {
+                    console.log('❌ No token found, setting isPremiumUser = false');
+                    isPremiumUser = false;
+                    return;
+                }
+
+                const response = await fetch(`/api/subscriptions/status?_t=${Date.now()}`, {
+                    method: 'GET',
+                    cache: 'no-cache',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('🔍 Subscription API Response:', data);
+                    isPremiumUser = data.success && data.subscription.status === 'active';
+                    
+                    if (isPremiumUser) {
+                        console.log('✅ Premium subscription active:', data.subscription.plan);
+                    } else {
+                        console.log('❌ No premium subscription detected:', {
+                            success: data.success,
+                            status: data.subscription?.status,
+                            plan: data.subscription?.plan
+                        });
+                    }
+                } else {
+                    console.log('❌ Subscription API failed:', response.status, response.statusText);
+                    isPremiumUser = false;
+                }
+            } catch (error) {
+                console.error('Error checking premium status:', error);
+                isPremiumUser = false;
+            }
+        }
+
+        // Show activity content for premium users
+        function showActivityContent() {
+            document.getElementById('premiumNotice').style.display = 'none';
+            document.getElementById('activityContent').style.display = 'block';
+        }
+
+        // Load user goals
+        async function loadUserGoals() {
+            if (!currentUser) return;
+
+            try {
+                // Load both broker and investor goals
+                const [brokerResponse, investorResponse] = await Promise.all([
+                    fetch('/api/goals/load?type=broker', {
+                        headers: { 'Authorization': `Bearer ${accessToken}` }
+                    }),
+                    fetch('/api/goals/load?type=investor', {
+                        headers: { 'Authorization': `Bearer ${accessToken}` }
+                    })
+                ]);
+
+                if (brokerResponse.ok) {
+                    const result = await brokerResponse.json();
+                    if (result.goals && result.goals.goal_data) {
+                        brokerGoals = result.goals.goal_data;
+                    }
+                }
+
+                if (investorResponse.ok) {
+                    const result = await investorResponse.json();
+                    if (result.goals && result.goals.goal_data) {
+                        investorGoals = result.goals.goal_data;
+                    }
+                }
+
+                // Set userGoals to current role's goals
+                userGoals = currentActivityRole === 'broker' ? brokerGoals : investorGoals;
+                
+                // Load user's preferred activity role
+                const preferredRole = localStorage.getItem('preferredActivityRole');
+                if (preferredRole && (preferredRole === 'broker' || preferredRole === 'investor')) {
+                    switchActivityRole(preferredRole);
+                }
+
+            } catch (error) {
+                console.error('Load goals error:', error);
+            }
+        }
+
+        // Display performance dashboard
+        function displayGoalsComparison() {
+            const performanceDashboard = document.getElementById('performanceDashboard');
+            const noGoalsMessage = document.getElementById('noGoalsMessage');
+            
+            // Get goals for current role
+            const currentGoals = currentActivityRole === 'broker' ? brokerGoals : investorGoals;
+            const roleLabel = currentActivityRole === 'broker' ? 'Broker' : 'Investor';
+            
+            if (currentGoals && currentGoals.dailyAttempts) {
+                // Show dashboard, hide no goals message
+                const dashboardGrid = document.querySelector('.dashboard-grid');
+                if (dashboardGrid) dashboardGrid.style.display = 'grid';
+                if (noGoalsMessage) noGoalsMessage.style.display = 'none';
+
+                // Calculate yearly targets
+                const weeksWorked = currentGoals.weeksWorked || 47; // Fallback if not available
+                const yearlyAttempts = Math.round(currentGoals.dailyAttempts * weeksWorked * 5);
+                const yearlyContacts = Math.round(currentGoals.decisionMakers || (yearlyAttempts * 0.15));
+                const yearlyAppointments = Math.round(currentGoals.appointmentsNeeded || (yearlyContacts * 0.1));
+                const yearlyContracts = Math.round(currentGoals.contractsNeeded || (yearlyAppointments * 0.1));
+                const yearlyClosings = Math.round(currentGoals.closingsNeeded || (yearlyContracts * 0.75));
+                const yearlyCommission = currentGoals.netCommission || 500000;
+
+                // Set targets (don't update current values yet - will be loaded from database)
+                const dailyAttemptsTarget = document.getElementById('dailyAttemptsTarget');
+                const totalContactsTarget = document.getElementById('totalContactsTarget');
+                const totalAppointmentsTarget = document.getElementById('totalAppointmentsTarget');
+                const totalContractsTarget = document.getElementById('totalContractsTarget');
+                const totalClosingsTarget = document.getElementById('totalClosingsTarget');
+                const commissionTarget = document.getElementById('commissionTarget');
+                
+                if (dailyAttemptsTarget) dailyAttemptsTarget.textContent = Math.round(currentGoals.dailyAttempts);
+                if (totalContactsTarget) totalContactsTarget.textContent = yearlyContacts;
+                if (totalAppointmentsTarget) totalAppointmentsTarget.textContent = yearlyAppointments;
+                if (totalContractsTarget) totalContractsTarget.textContent = yearlyContracts;
+                if (totalClosingsTarget) totalClosingsTarget.textContent = yearlyClosings;
+                if (commissionTarget) commissionTarget.textContent = formatCurrency(yearlyCommission);
+
+                // Load actual activity data to populate current values
+                loadDashboardData();
+
+            } else {
+                // Hide dashboard, show no goals message
+                const dashboardGrid = document.querySelector('.dashboard-grid');
+                if (dashboardGrid) dashboardGrid.style.display = 'none';
+                if (noGoalsMessage) {
+                    noGoalsMessage.style.display = 'block';
+                    noGoalsMessage.innerHTML = `<p>No ${roleLabel.toLowerCase()} goals found. <a href="/calculator">Calculate your ${roleLabel.toLowerCase()} goals first</a></p>`;
+                }
+            }
+            
+            // Update userGoals reference for other functions
+            userGoals = currentGoals;
+        }
+
+        // Update dashboard metric
+        function updateDashboardMetric(metricId, current, target, percentage) {
+            const valueElement = document.getElementById(metricId);
+            const targetElement = document.getElementById(metricId + 'Target');
+            const progressElement = document.getElementById(metricId + 'Progress');
+            
+            if (valueElement) valueElement.textContent = current;
+            if (targetElement) targetElement.textContent = target;
+            if (progressElement) updateProgressBar(metricId + 'Progress', percentage);
+        }
+
+        // Update progress bar
+        function updateProgressBar(elementId, percentage) {
+            const progressBar = document.getElementById(elementId);
+            if (progressBar) {
+                progressBar.style.width = Math.min(percentage, 100) + '%';
+            }
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Load dashboard data from database
+        async function loadDashboardData() {
+            if (!isPremiumUser || !currentUser) return;
+
+            try {
+                // Get all activities for current role (not limited to recent)
+                const response = await fetch(`/api/activities/list?limit=1000&userType=${currentActivityRole}`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const activities = result.activities || [];
+                    
+                    // Calculate totals from actual database data
+                    const totals = activities.reduce((acc, activity) => {
+                        acc.attempts += activity.attempts || 0;
+                        acc.contacts += activity.contacts || 0;
+                        acc.appointments += activity.appointments || 0;
+                        acc.contracts += activity.contracts || 0;
+                        acc.closings += activity.closings || 0;
+                        return acc;
+                    }, {
+                        attempts: 0,
+                        contacts: 0,
+                        appointments: 0,
+                        contracts: 0,
+                        closings: 0
+                    });
+
+                    // Get today's activity for daily attempts
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayActivity = activities.find(a => a.activity_date === today);
+                    const todayAttempts = todayActivity ? (todayActivity.attempts || 0) : 0;
+
+                    // Update dashboard with REAL data
+                    updateDashboardValue('dailyAttempts', todayAttempts);
+                    updateDashboardValue('totalContacts', totals.contacts);
+                    updateDashboardValue('totalAppointments', totals.appointments);
+                    updateDashboardValue('totalContracts', totals.contracts);
+                    updateDashboardValue('totalClosings', totals.closings);
+
+                    // Calculate commission progress if we have goals
+                    const currentGoals = currentActivityRole === 'broker' ? brokerGoals : investorGoals;
+                    if (currentGoals && currentGoals.avgCommission && currentGoals.avgSalePrice) {
+                        const avgDealValue = currentGoals.avgSalePrice * (currentGoals.avgCommission / 100);
+                        const currentCommission = totals.closings * avgDealValue;
+                        updateDashboardValue('commissionProgress', formatCurrency(currentCommission));
+                        
+                        // Update progress bars
+                        if (currentGoals.dailyAttempts) {
+                            const dailyProgress = (todayAttempts / currentGoals.dailyAttempts) * 100;
+                            updateProgressBar('dailyAttemptsProgress', dailyProgress);
+                        }
+                        
+                        // Calculate yearly progress percentages
+                        const yearlyTargets = getYearlyTargets(currentGoals);
+                        updateProgressBar('totalContactsProgress', (totals.contacts / yearlyTargets.contacts) * 100);
+                        updateProgressBar('totalAppointmentsProgress', (totals.appointments / yearlyTargets.appointments) * 100);
+                        updateProgressBar('totalContractsProgress', (totals.contracts / yearlyTargets.contracts) * 100);
+                        updateProgressBar('totalClosingsProgress', (totals.closings / yearlyTargets.closings) * 100);
+                        updateProgressBar('commissionProgressBar', (currentCommission / currentGoals.netCommission) * 100);
+                    }
+                }
+
+            } catch (error) {
+                console.error('Load dashboard data error:', error);
+            }
+        }
+
+        // Update dashboard value only (not target)
+        function updateDashboardValue(metricId, value) {
+            const valueElement = document.getElementById(metricId);
+            if (valueElement) {
+                if (typeof value === 'string' && value.startsWith('$')) {
+                    valueElement.textContent = value;
+                } else {
+                    valueElement.textContent = value;
+                }
+            }
+        }
+
+        // Get yearly targets from goals
+        function getYearlyTargets(goals) {
+            const weeksWorked = goals.weeksWorked || 47;
+            return {
+                attempts: Math.round(goals.dailyAttempts * weeksWorked * 5),
+                contacts: Math.round(goals.decisionMakers || (goals.dailyAttempts * weeksWorked * 5 * 0.15)),
+                appointments: Math.round(goals.appointmentsNeeded || 75),
+                contracts: Math.round(goals.contractsNeeded || 8),
+                closings: Math.round(goals.closingsNeeded || 6)
+            };
+        }
+
+        // Handle activity form submission
+        async function handleActivitySubmit(e) {
+            e.preventDefault();
+
+            if (!isPremiumUser) {
+                showUpgradeModal();
+                return;
+            }
+
+            const formData = {
+                date: document.getElementById('activityDate').value,
+                attempts: parseInt(document.getElementById('attempts').value) || 0,
+                contacts: parseInt(document.getElementById('contacts').value) || 0,
+                appointments: parseInt(document.getElementById('appointments').value) || 0,
+                contracts: parseInt(document.getElementById('contracts').value) || 0,
+                closings: parseInt(document.getElementById('closings').value) || 0,
+                userType: currentActivityRole // Include the current role
+            };
+
+            try {
+                const response = await fetch('/api/activities/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('Activity saved successfully!');
+                    await loadRecentActivities();
+                    await loadDashboardData(); // Refresh dashboard with real data
+                    await updateQuickStats();
+                } else {
+                    const error = await response.json();
+                    alert('Failed to save activity: ' + (error.error || 'Unknown error'));
+                }
+
+            } catch (error) {
+                console.error('Save activity error:', error);
+                alert('Failed to save activity. Please try again.');
+            }
+        }
+
+        // Load recent activities
+        async function loadRecentActivities(period = 7) {
+            if (!isPremiumUser || !currentUser) return;
+
+            try {
+                const response = await fetch(`/api/activities/list?limit=${period * 2}&userType=${currentActivityRole}`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displayActivityList(result.activities || [], period);
+                }
+
+            } catch (error) {
+                console.error('Load activities error:', error);
+            }
+        }
+
+        // Display activity list
+        function displayActivityList(activities, period) {
+            const activityList = document.getElementById('activityList');
+            
+            if (!activities.length) {
+                activityList.innerHTML = '<p class="no-activities-message">No activities recorded yet. Add your first activity above!</p>';
+                return;
+            }
+
+            // Filter activities by period
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - period);
+            
+            const filteredActivities = activities.filter(activity => 
+                new Date(activity.activity_date) >= cutoffDate
+            );
+
+            if (!filteredActivities.length) {
+                activityList.innerHTML = `<p class="no-activities-message">No activities recorded in the last ${period} days.</p>`;
+                return;
+            }
+
+            const activityHtml = filteredActivities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-date">${formatDate(activity.activity_date)}</div>
+                    <div class="activity-stats">
+                        <span class="stat">Attempts: ${activity.attempts || 0}</span>
+                        <span class="stat">Contacts: ${activity.contacts || 0}</span>
+                        <span class="stat">Appointments: ${activity.appointments || 0}</span>
+                        <span class="stat">Contracts: ${activity.contracts || 0}</span>
+                        <span class="stat">Closings: ${activity.closings || 0}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            activityList.innerHTML = activityHtml;
+        }
+
+        // Update quick stats
+        async function updateQuickStats() {
+            if (!isPremiumUser || !currentUser) return;
+
+            try {
+                const [weeklyResponse, monthlyResponse] = await Promise.all([
+                    fetch(`/api/activities/stats?period=7&userType=${currentActivityRole}`, {
+                        headers: { 'Authorization': `Bearer ${accessToken}` }
+                    }),
+                    fetch(`/api/activities/stats?period=30&userType=${currentActivityRole}`, {
+                        headers: { 'Authorization': `Bearer ${accessToken}` }
+                    })
+                ]);
+
+                if (weeklyResponse.ok && monthlyResponse.ok) {
+                    const weeklyData = await weeklyResponse.json();
+                    const monthlyData = await monthlyResponse.json();
+
+                    document.getElementById('weeklyAttempts').textContent = Math.round(weeklyData.stats.averageAttempts * 7);
+                    document.getElementById('monthlyAttempts').textContent = Math.round(monthlyData.stats.averageAttempts * 30);
+                    document.getElementById('successRate').textContent = weeklyData.stats.conversionRates.attemptToContact + '%';
+                }
+
+            } catch (error) {
+                console.error('Update stats error:', error);
+            }
+        }
+
+        // Update goals progress for today
+        function updateGoalsProgress(todayData) {
+            if (!userGoals || !userGoals.dailyAttempts) return;
+
+            const progressFill = document.getElementById('attemptsProgress');
+            const todayAttemptsSpan = document.getElementById('todayAttempts');
+            
+            if (progressFill && todayAttemptsSpan) {
+                const percentage = Math.min((todayData.attempts / userGoals.dailyAttempts) * 100, 100);
+                progressFill.style.width = percentage + '%';
+                todayAttemptsSpan.textContent = todayData.attempts;
+                
+                // Color coding
+                if (percentage >= 100) {
+                    progressFill.style.backgroundColor = 'var(--success-color)';
+                } else if (percentage >= 50) {
+                    progressFill.style.backgroundColor = 'var(--warning-color)';
+                } else {
+                    progressFill.style.backgroundColor = 'var(--error-color)';
+                }
+            }
+        }
+
+        // Save user's activity role preference to server
+        async function saveUserActivityRolePreference(role) {
+            try {
+                await fetch('/api/auth/update-activity-role', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({ defaultActivityRole: role })
+                });
+            } catch (error) {
+                console.error('Save activity role preference error:', error);
+            }
+        }
+
+        // Utility functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'short',
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+
+        function clearForm() {
+            document.getElementById('attempts').value = '0';
+            document.getElementById('contacts').value = '0';
+            document.getElementById('appointments').value = '0';
+            document.getElementById('contracts').value = '0';
+            document.getElementById('closings').value = '0';
+        }
+
+        // Modal functions
+        function showUpgradeModal() {
+            document.getElementById('upgradeModal').style.display = 'flex';
+        }
+
+        function closeUpgradeModal() {
+            document.getElementById('upgradeModal').style.display = 'none';
+        }
+
+        function initiateUpgrade() {
+            // Debug: Check token before navigation
+            const token = localStorage.getItem('token');
+            console.log('=== BEFORE NAVIGATION TO PRICING ===');
+            console.log('Token exists:', !!token);
+            console.log('Token value:', token ? token.substring(0, 20) + '...' : 'null');
+            console.log('About to navigate to /pricing...');
+            
+            // For logged-in users, redirect to pricing page (which now preserves login state)
+            window.location.href = '/pricing';
+        }
+
+        // Logout handler
+        async function handleLogout() {
+            try {
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                localStorage.clear();
+                window.location.href = '/login';
+
+            } catch (error) {
+                console.error('Logout error:', error);
+                localStorage.clear();
+                window.location.href = '/login';
+            }
+        }
+    </script>
+
+    <!-- Auth Management -->
+    <script src="/js/auth.js"></script>
+    
+    <!-- Iframe Detection -->
+    <script src="/js/iframe-detector.js"></script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Pro! - Income Goal Calculator | AcquisitionPRO®</title>
+    
+    <meta name="description" content="Welcome to Income Goal Calculator Pro! Your subscription is active and you now have access to all premium features.">
+    <meta name="robots" content="noindex">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/images/icon.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css?v=1.2">
+    <link rel="stylesheet" href="/css/app.css?v=1.2">
+    
+    <!-- Authentication -->
+    <script src="/js/auth.js"></script>
+    
+    <style>
+        .success-section {
+            padding: var(--spacing-2xl) 0;
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            min-height: calc(100vh - 200px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .success-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            text-align: center;
+            width: 100%;
+        }
+
+        .success-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-2xl);
+            box-shadow: var(--shadow-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-lg);
+            font-size: 2.5rem;
+        }
+
+        .success-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-navy);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .success-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: var(--spacing-xl);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin: var(--spacing-xl) 0;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            border-left: 4px solid var(--secondary-blue);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-navy);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .feature-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: var(--spacing-xl);
+        }
+
+        .cta-button {
+            background: var(--secondary-blue);
+            color: var(--white);
+            padding: var(--spacing-md) var(--spacing-xl);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: var(--primary-navy);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .cta-button.secondary {
+            background: transparent;
+            color: var(--secondary-blue);
+            border: 2px solid var(--secondary-blue);
+        }
+
+        .cta-button.secondary:hover {
+            background: var(--secondary-blue);
+            color: var(--white);
+        }
+
+        .next-steps {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+        }
+
+        .next-steps-title {
+            color: var(--primary-navy);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            text-align: center;
+        }
+
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+            max-width: 500px;
+            margin: 0 auto;
+            counter-reset: step;
+        }
+
+        .steps-list li {
+            color: var(--gray-700);
+            padding: var(--spacing-md) 0;
+            position: relative;
+            padding-left: var(--spacing-2xl);
+            line-height: 1.4;
+        }
+
+        .steps-list li::before {
+            content: counter(step);
+            counter-increment: step;
+            position: absolute;
+            left: 0;
+            top: var(--spacing-md);
+            background: var(--secondary-blue);
+            color: var(--white);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        /* Loading states */
+        .loading {
+            opacity: 0.6;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--secondary-blue);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: var(--spacing-xs);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .success-title {
+                font-size: 2rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-button {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        /* Celebration animation */
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .celebrate {
+            animation: celebrate 0.8s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="container">
+                <div class="header-content">
+                    <a href="/app" class="logo-link">
+                        <img src="/images/logo.png" alt="AcquisitionPRO Logo" class="logo">
+                    </a>
+                    <nav class="app-nav">
+                        <a href="/app" class="nav-link">Dashboard</a>
+                        <a href="/calculator" class="nav-link">Calculator</a>
+                        <a href="/activities" class="nav-link">Activity Tracker</a>
+                        <a href="/profile" class="nav-link">Profile</a>
+                    </nav>
+                    <div class="user-menu">
+                        <span class="user-greeting" id="userGreeting">Loading...</span>
+                        <button class="btn btn-secondary btn-sm" id="logoutButton">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+    <main class="success-section">
+        <div class="success-container">
+            <div class="success-card" id="successCard">
+                <div class="success-icon celebrate">
+                    🎉
+                </div>
+                <h1 class="success-title">Welcome to Pro!</h1>
+                <p class="success-subtitle">
+                    Your subscription is now active! You have full access to all premium features 
+                    and professional CRE activity tracking tools.
+                </p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-title">Activity Tracking</div>
+                        <div class="feature-description">
+                            Log daily activities and track your progress against calculated goals
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-title">Goal Management</div>
+                        <div class="feature-description">
+                            Save and manage multiple goal scenarios for both broker and investor roles
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <div class="feature-title">Progress Dashboard</div>
+                        <div class="feature-description">
+                            Real-time performance analytics with professional visualization
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📚</div>
+                        <div class="feature-title">Historical Data</div>
+                        <div class="feature-description">
+                            Access historical activity data and performance trends over time
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-buttons">
+                    <a href="/activities" class="cta-button">
+                        📊 Start Tracking Activities
+                    </a>
+                    <a href="/calculator" class="cta-button secondary">
+                        🧮 Update Your Goals
+                    </a>
+                </div>
+            </div>
+
+            <div class="next-steps">
+                <h3 class="next-steps-title">Get Started in 3 Steps</h3>
+                <ol class="steps-list">
+                    <li>Set your income goals using the dual calculator system</li>
+                    <li>Start logging daily activities in the Activity Tracker</li>
+                    <li>Monitor your progress with real-time performance analytics</li>
+                </ol>
+            </div>
+        </div>
+    </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-logo-section">
+                        <img src="/images/logo.png" alt="AcquisitionPRO Logo" class="footer-logo">
+                        <p>&copy; 2025 AcquisitionPRO. All rights reserved.</p>
+                    </div>
+                    <div class="footer-links">
+                        <a href="/privacy">Privacy Policy</a>
+                        <a href="/terms">Terms of Service</a>
+                        <a href="/contact">Contact</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let accessToken = null;
+
+        // DOM Elements
+        const userGreeting = document.getElementById('userGreeting');
+        const logoutButton = document.getElementById('logoutButton');
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initializeAuth();
+            await handleSubscriptionSuccess();
+            addCelebrationAnimation();
+            setupEventListeners();
+        });
+
+        // Authentication initialization
+        async function initializeAuth() {
+            accessToken = localStorage.getItem('access_token');
+            
+            if (!accessToken) {
+                redirectToLogin();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        redirectToLogin();
+                        return;
+                    }
+                    throw new Error('Failed to fetch profile');
+                }
+
+                const result = await response.json();
+                currentUser = result.user;
+                
+                // Update user greeting
+                if (currentUser.profile) {
+                    userGreeting.textContent = `Hello, ${currentUser.profile.first_name}!`;
+                } else {
+                    userGreeting.textContent = 'Hello!';
+                }
+
+            } catch (error) {
+                console.error('Auth initialization error:', error);
+                redirectToLogin();
+            }
+        }
+
+        function redirectToLogin() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user_profile');
+            window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Logout button
+            logoutButton.addEventListener('click', handleLogout);
+        }
+
+        // Logout handler
+        async function handleLogout() {
+            try {
+                // Call logout endpoint
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                // Clear local storage
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('user_profile');
+
+                // Redirect to login
+                window.location.href = '/login';
+
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Still clear local storage and redirect
+                localStorage.clear();
+                window.location.href = '/login';
+            }
+        }
+
+        // Handle subscription success
+        async function handleSubscriptionSuccess() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session_id');
+
+            if (sessionId) {
+                // Verify the session was successful and update user status
+                try {
+                    const token = localStorage.getItem('access_token');
+                    if (token) {
+                        // Refresh user's subscription status
+                        const response = await fetch('/api/subscriptions/status', {
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success && data.subscription.status === 'active') {
+                                console.log('Subscription confirmed active');
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error verifying subscription:', error);
+                }
+
+                // Clean up URL
+                const cleanUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+            }
+        }
+
+        // Add celebration animation
+        function addCelebrationAnimation() {
+            const successCard = document.getElementById('successCard');
+            
+            // Trigger celebration after a short delay
+            setTimeout(() => {
+                successCard.style.animation = 'celebrate 0.8s ease-in-out';
+            }, 500);
+
+            // Add periodic celebration
+            setInterval(() => {
+                const icon = document.querySelector('.success-icon');
+                icon.classList.remove('celebrate');
+                setTimeout(() => icon.classList.add('celebrate'), 100);
+            }, 10000); // Every 10 seconds
+        }
+
+        // Navigation helper
+        function navigateTo(url) {
+            window.location.href = url;
+        }
+    </script>
+
+    <!-- Auth Management -->
+    <script src="/js/auth.js"></script>
+    
+    <!-- Iframe Detection -->
+    <script src="/js/iframe-detector.js"></script>
+</body>
+</html>
