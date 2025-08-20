@@ -10,7 +10,7 @@ const morgan = require('morgan');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 
 // Trust proxy (important for Hostgator VPS deployment)
 app.set('trust proxy', 1);
