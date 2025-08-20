@@ -7,33 +7,35 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const path = require('path');
 const morgan = require('morgan');
+const https = require('https');
+const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || (process.env.NODE_ENV === 'production' ? 443 : 3000);
 
 // Trust proxy (important for Hostgator VPS deployment)
 app.set('trust proxy', 1);
 
-// Security middleware - Completely disabled for HTTP deployment
-// app.use(helmet()); // Completely disable helmet for now
-
-// Custom headers to prevent HTTPS enforcement
-app.use((req, res, next) => {
-  // Remove any headers that might enforce HTTPS
-  res.removeHeader('Strict-Transport-Security');
-  res.removeHeader('Content-Security-Policy');
-  res.removeHeader('Cross-Origin-Opener-Policy');
-  res.removeHeader('Cross-Origin-Embedder-Policy');
-  res.removeHeader('Cross-Origin-Resource-Policy');
-  
-  // Force HTTP for assets
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  
-  next();
-});
+// Security middleware - Re-enabled for HTTPS production
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https://storage.googleapis.com", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://cdn.jsdelivr.net", "https://player.vimeo.com"],
+      connectSrc: ["'self'", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co", "https://api.stripe.com", "https://player.vimeo.com"],
+      frameSrc: ["'self'", "https://js.stripe.com", "https://player.vimeo.com"]
+    },
+  },
+  hsts: {
+    maxAge: 31536000, // 1 year
+    includeSubDomains: true,
+    preload: true
+  }
+}));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -57,8 +59,8 @@ const authLimiter = rateLimit({
 // CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://acquisitionpro.io', 'https://www.acquisitionpro.io', 'http://igc.acquisitionpro.io', 'http://igc.acquisitionpro.io:3000']
-    : ['http://localhost:3000'],
+    ? ['https://acquisitionpro.io', 'https://www.acquisitionpro.io', 'https://igc.acquisitionpro.io', 'http://igc.acquisitionpro.io', 'http://igc.acquisitionpro.io:3000']
+    : ['http://localhost:3000', 'https://localhost:3000'],
   credentials: true
 }));
 
@@ -82,10 +84,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // Set to false since we're running HTTP in production for now
+    secure: process.env.NODE_ENV === 'production', // Enable secure cookies for HTTPS in production
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax' // Changed from 'strict' to 'lax' for better compatibility
+    sameSite: 'strict' // Re-enable strict for better security with HTTPS
   }
 }));
 
@@ -234,12 +236,8 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-// Start server
-app.listen(PORT, async () => {
-  console.log(`🚀 Income Goal Calculator server running on port ${PORT}`);
-  console.log(`📱 Environment: ${process.env.NODE_ENV}`);
-  console.log(`🔗 Local URL: http://localhost:${PORT}`);
-  
+// Start server (HTTP or HTTPS based on environment)
+async function startServer() {
   // Initialize Stripe products and prices
   if (process.env.STRIPE_SECRET_KEY) {
     try {
@@ -252,18 +250,48 @@ app.listen(PORT, async () => {
   } else {
     console.log('⚠️  Stripe not configured (missing STRIPE_SECRET_KEY)');
   }
-  
-  if (process.env.NODE_ENV === 'development') {
-    console.log('\n📋 Available routes:');
-    console.log('  🏠 Homepage: http://localhost:' + PORT);
-    console.log('  🧮 Calculator: http://localhost:' + PORT + '/calculator');
-    console.log('  💰 Pricing: http://localhost:' + PORT + '/pricing');
-    console.log('  🔐 Login: http://localhost:' + PORT + '/login');
-    console.log('  📝 Register: http://localhost:' + PORT + '/register');
-    console.log('  📊 App: http://localhost:' + PORT + '/app');
-    console.log('  👤 Profile: http://localhost:' + PORT + '/profile');
-    console.log('  ⚡ Health: http://localhost:' + PORT + '/api/health');
+
+  if (process.env.NODE_ENV === 'production' && process.env.SSL_KEY && process.env.SSL_CERT) {
+    // HTTPS server for production with SSL certificates
+    const httpsOptions = {
+      key: fs.readFileSync(process.env.SSL_KEY),
+      cert: fs.readFileSync(process.env.SSL_CERT)
+    };
+
+    https.createServer(httpsOptions, app).listen(PORT, () => {
+      console.log(`🚀 Income Goal Calculator HTTPS server running on port ${PORT}`);
+      console.log(`📱 Environment: ${process.env.NODE_ENV}`);
+      console.log(`🔗 URL: https://igc.acquisitionpro.io`);
+      console.log('🔒 SSL/TLS encryption enabled');
+    });
+  } else {
+    // HTTP server for development or when SSL not configured
+    app.listen(PORT, () => {
+      console.log(`🚀 Income Goal Calculator HTTP server running on port ${PORT}`);
+      console.log(`📱 Environment: ${process.env.NODE_ENV}`);
+      const protocol = process.env.NODE_ENV === 'production' ? 'http' : 'http';
+      console.log(`🔗 Local URL: ${protocol}://localhost:${PORT}`);
+      
+      if (process.env.NODE_ENV === 'production' && !process.env.SSL_KEY) {
+        console.log('⚠️  Running HTTP in production - SSL certificates not configured');
+        console.log('   Set SSL_KEY and SSL_CERT environment variables for HTTPS');
+      }
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('\n📋 Available routes:');
+        console.log(`  🏠 Homepage: ${protocol}://localhost:${PORT}`);
+        console.log(`  🧮 Calculator: ${protocol}://localhost:${PORT}/calculator`);
+        console.log(`  💰 Pricing: ${protocol}://localhost:${PORT}/pricing`);
+        console.log(`  🔐 Login: ${protocol}://localhost:${PORT}/login`);
+        console.log(`  📝 Register: ${protocol}://localhost:${PORT}/register`);
+        console.log(`  📊 App: ${protocol}://localhost:${PORT}/app`);
+        console.log(`  👤 Profile: ${protocol}://localhost:${PORT}/profile`);
+        console.log(`  ⚡ Health: ${protocol}://localhost:${PORT}/api/health`);
+      }
+    });
   }
-});
+}
+
+startServer();
 
 module.exports = app;
