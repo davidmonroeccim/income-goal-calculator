@@ -15,20 +15,12 @@ const PORT = process.env.PORT || 3000;
 // Trust proxy (important for Hostgator VPS deployment)
 app.set('trust proxy', 1);
 
-// Security middleware
+// Security middleware - Relaxed for HTTP deployment
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'", "http://igc.acquisitionpro.io", "http://igc.acquisitionpro.io:3000"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "http://igc.acquisitionpro.io", "http://igc.acquisitionpro.io:3000"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com", "http://igc.acquisitionpro.io", "http://igc.acquisitionpro.io:3000"],
-      imgSrc: ["'self'", "data:", "https://storage.googleapis.com", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co", "http://igc.acquisitionpro.io", "http://igc.acquisitionpro.io:3000"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://cdn.jsdelivr.net", "https://player.vimeo.com", "http://igc.acquisitionpro.io", "http://igc.acquisitionpro.io:3000"],
-      connectSrc: ["'self'", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co", "https://api.stripe.com", "https://player.vimeo.com", "http://igc.acquisitionpro.io", "http://igc.acquisitionpro.io:3000"],
-      frameSrc: ["'self'", "https://js.stripe.com", "https://player.vimeo.com"]
-    },
-  },
-  crossOriginEmbedderPolicy: false
+  contentSecurityPolicy: false, // Temporarily disable CSP to test
+  crossOriginOpenerPolicy: false, // Disable COOP header
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: false // Disable CORP header
 }));
 
 // Rate limiting
