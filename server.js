@@ -15,13 +15,25 @@ const PORT = process.env.PORT || 80;
 // Trust proxy (important for Hostgator VPS deployment)
 app.set('trust proxy', 1);
 
-// Security middleware - Relaxed for HTTP deployment
-app.use(helmet({
-  contentSecurityPolicy: false, // Temporarily disable CSP to test
-  crossOriginOpenerPolicy: false, // Disable COOP header
-  crossOriginEmbedderPolicy: false,
-  crossOriginResourcePolicy: false // Disable CORP header
-}));
+// Security middleware - Completely disabled for HTTP deployment
+// app.use(helmet()); // Completely disable helmet for now
+
+// Custom headers to prevent HTTPS enforcement
+app.use((req, res, next) => {
+  // Remove any headers that might enforce HTTPS
+  res.removeHeader('Strict-Transport-Security');
+  res.removeHeader('Content-Security-Policy');
+  res.removeHeader('Cross-Origin-Opener-Policy');
+  res.removeHeader('Cross-Origin-Embedder-Policy');
+  res.removeHeader('Cross-Origin-Resource-Policy');
+  
+  // Force HTTP for assets
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  
+  next();
+});
 
 // Rate limiting
 const limiter = rateLimit({
