@@ -245,8 +245,11 @@
                 showFieldError('emailError', 'Email is required');
                 isValid = false;
             } else if (!isValidEmail(email)) {
+                console.log('Form validation: Email validation failed for:', email);
                 showFieldError('emailError', 'Please enter a valid email address');
                 isValid = false;
+            } else {
+                console.log('Form validation: Email passed validation:', email);
             }
 
             // Password validation
@@ -277,8 +280,17 @@
         }
 
         function isValidEmail(email) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(email);
+            // More comprehensive email validation
+            const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+            const isValid = emailRegex.test(email);
+            
+            // Debug logging
+            if (!isValid) {
+                console.log('Email validation failed for:', email);
+                console.log('Regex test result:', isValid);
+            }
+            
+            return isValid;
         }
 
         function showFieldError(fieldId, message) {

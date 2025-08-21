@@ -29,13 +29,16 @@ router.post('/register', strictAuthLimiter, async (req, res) => {
       });
     }
 
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Email format validation - More comprehensive regex
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (!emailRegex.test(email)) {
+      console.log('❌ Backend email validation failed for:', email);
       return res.status(400).json({
         error: 'Invalid email format',
         code: 'INVALID_EMAIL'
       });
+    } else {
+      console.log('✅ Backend email validation passed for:', email);
     }
 
     // Password strength validation
@@ -69,13 +72,23 @@ router.post('/register', strictAuthLimiter, async (req, res) => {
     });
 
     if (authError) {
-      console.error('Supabase auth error:', authError);
+      console.error('Supabase auth error for email:', email.toLowerCase(), 'Error:', authError);
+      console.error('Full error object:', JSON.stringify(authError, null, 2));
       
       // Handle specific Supabase errors
       if (authError.message.includes('already registered')) {
         return res.status(409).json({
           error: 'An account with this email already exists',
           code: 'USER_EXISTS'
+        });
+      }
+      
+      // Check for invalid email errors from Supabase
+      if (authError.message.includes('invalid') && authError.message.includes('email')) {
+        console.log('Supabase rejected email as invalid:', email.toLowerCase());
+        return res.status(400).json({
+          error: 'Invalid email address format',
+          code: 'INVALID_EMAIL'
         });
       }
       
@@ -288,13 +301,16 @@ router.post('/forgot-password', strictAuthLimiter, async (req, res) => {
       });
     }
 
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Email format validation - More comprehensive regex
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (!emailRegex.test(email)) {
+      console.log('❌ Backend email validation failed for:', email);
       return res.status(400).json({
         error: 'Invalid email format',
         code: 'INVALID_EMAIL'
       });
+    } else {
+      console.log('✅ Backend email validation passed for:', email);
     }
 
     // Send password reset email
@@ -681,13 +697,16 @@ router.post('/register-after-payment', strictAuthLimiter, async (req, res) => {
       });
     }
 
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Email format validation - More comprehensive regex
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     if (!emailRegex.test(email)) {
+      console.log('❌ Backend email validation failed for:', email);
       return res.status(400).json({
         error: 'Invalid email format',
         code: 'INVALID_EMAIL'
       });
+    } else {
+      console.log('✅ Backend email validation passed for:', email);
     }
 
     // Password strength validation
