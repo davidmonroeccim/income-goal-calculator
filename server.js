@@ -243,9 +243,8 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-// Start server (HTTP or HTTPS based on environment)
-async function startServer() {
-  // Initialize Stripe products and prices
+// Initialize Stripe products on startup
+async function initializeStripe() {
   if (process.env.STRIPE_SECRET_KEY) {
     try {
       const { initializeStripeProducts } = require('./services/stripe');
@@ -257,6 +256,11 @@ async function startServer() {
   } else {
     console.log('⚠️  Stripe not configured (missing STRIPE_SECRET_KEY)');
   }
+}
+
+// Start server function (only for traditional hosting, not serverless)
+async function startServer() {
+  await initializeStripe();
 
   if (process.env.NODE_ENV === 'production' && process.env.SSL_KEY && process.env.SSL_CERT) {
     // HTTPS server for production with SSL certificates
@@ -299,6 +303,12 @@ async function startServer() {
   }
 }
 
-startServer();
+// Initialize Stripe for serverless environments too
+initializeStripe();
+
+// Only start server if not in serverless environment (Vercel)
+if (!process.env.VERCEL) {
+  startServer();
+}
 
 module.exports = app;
