@@ -29,18 +29,24 @@ class AuthManager {
         // Check session on page load
         this.validateSession();
 
-        // Set up periodic session checks (every 5 minutes)
+        // Set up periodic session checks (every 15 minutes - less aggressive)
         this.sessionCheckInterval = setInterval(() => {
             this.validateSession();
-        }, 5 * 60 * 1000);
+        }, 15 * 60 * 1000);
 
         // Set up token refresh based on expiry
         this.scheduleTokenRefresh();
 
-        // Handle page visibility changes
+        // Handle page visibility changes (less aggressive - only validate after longer absence)
+        let lastVisibilityChange = Date.now();
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
-                this.validateSession();
+                const timeSinceLastCheck = Date.now() - lastVisibilityChange;
+                // Only validate if user was away for more than 5 minutes
+                if (timeSinceLastCheck > 5 * 60 * 1000) {
+                    this.validateSession();
+                }
+                lastVisibilityChange = Date.now();
             }
         });
 
@@ -80,6 +86,26 @@ class AuthManager {
 
         } catch (error) {
             console.error('Session validation error:', error);
+            // Don't immediately logout on validation errors - token might still be valid
+            // Only logout if this is a critical error (like network is completely down)
+            
+            // Try to gracefully handle the error
+            try {
+                const tokenData = this.parseJWT(accessToken);
+                if (tokenData.exp) {
+                    const now = Math.floor(Date.now() / 1000);
+                    // If token is not expired, keep the user logged in despite validation error
+                    if (tokenData.exp > now) {
+                        console.log('Token appears valid despite validation error, keeping user logged in');
+                        return true;
+                    }
+                }
+            } catch (parseError) {
+                console.error('Could not parse token during error recovery:', parseError);
+            }
+            
+            // Only redirect to login as last resort
+            console.log('All recovery attempts failed, redirecting to login');
             if (this.isProtectedPage()) {
                 this.redirectToLogin();
             }
@@ -120,7 +146,8 @@ class AuthManager {
 
         } catch (error) {
             console.error('Token refresh error:', error);
-            this.redirectToLogin();
+            // Don't immediately logout on refresh errors - might be temporary network issue
+            console.log('Token refresh failed, but keeping user logged in for now');
             return false;
         } finally {
             this.isRefreshing = false;
@@ -272,10 +299,21 @@ class AuthManager {
             throw new Error('No access token available');
         }
 
-        // Validate session before making request
-        const sessionValid = await this.validateSession();
-        if (!sessionValid) {
-            throw new Error('Session invalid');
+        // Check if token exists and is not obviously expired before making request
+        try {
+            const tokenData = this.parseJWT(accessToken);
+            const now = Math.floor(Date.now() / 1000);
+            if (tokenData.exp && tokenData.exp < now) {
+                // Token is clearly expired, try to refresh
+                const refreshed = await this.refreshToken();
+                if (!refreshed) {
+                    throw new Error('Session invalid - could not refresh token');
+                }
+            }
+        } catch (error) {
+            // If we can't parse the token, it might be invalid, but let's try the request anyway
+            // The server will tell us if it's really invalid
+            console.warn('Could not validate token before request, proceeding anyway:', error);
         }
 
         const authOptions = {
@@ -290,13 +328,17 @@ class AuthManager {
 
         // Handle token expiry
         if (response.status === 401) {
+            console.log('Got 401, attempting token refresh for request:', url);
             const refreshed = await this.refreshToken();
             if (refreshed) {
                 // Retry with new token
                 authOptions.headers['Authorization'] = `Bearer ${this.getAccessToken()}`;
+                console.log('Token refreshed, retrying request');
                 return fetch(url, authOptions);
             } else {
-                throw new Error('Authentication failed');
+                console.log('Token refresh failed for API request, but not logging user out immediately');
+                // Don't throw error immediately - let the calling code handle the 401
+                return response;
             }
         }
 
