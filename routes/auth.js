@@ -801,11 +801,11 @@ router.post('/register-after-payment', strictAuthLimiter, async (req, res) => {
         stripe_subscription_id: session.subscription,
         stripe_customer_id: session.customer,
         plan_type: planType,
-        amount: session.amount_total,
         currency: session.currency,
         event_data: {
           sessionId: sessionId,
-          paymentStatus: session.payment_status
+          paymentStatus: session.payment_status,
+          amount_total: session.amount_total
         },
         created_at: new Date().toISOString()
       }]);
@@ -814,19 +814,9 @@ router.post('/register-after-payment', strictAuthLimiter, async (req, res) => {
       console.error('Subscription event creation error:', eventError);
     }
 
-    // Sign in the user after registration
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-      email: email.toLowerCase(),
-      password: password
-    });
-
-    if (signInError) {
-      console.error('Auto-signin error:', signInError);
-      return res.status(500).json({
-        error: 'Account created but signin failed. Please try logging in.',
-        code: 'SIGNIN_ERROR'
-      });
-    }
+    // Don't attempt auto-signin for unconfirmed email users
+    // They need to confirm their email first before they can sign in
+    console.log('✅ User account created successfully, email confirmation required');
 
     res.json({
       success: true,
