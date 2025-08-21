@@ -68,7 +68,14 @@ app.use(cors({
 app.use(compression());
 
 // Body parsing middleware - Secure limits
-app.use(express.json({ limit: '1mb' }));
+// Exclude Stripe webhook from JSON parsing (needs raw body for signature verification)
+app.use((req, res, next) => {
+  if (req.originalUrl === '/api/subscriptions/webhook') {
+    next(); // Skip JSON parsing for webhooks
+  } else {
+    express.json({ limit: '1mb' })(req, res, next);
+  }
+});
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(cookieParser());
 
