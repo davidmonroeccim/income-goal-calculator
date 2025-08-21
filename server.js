@@ -96,11 +96,14 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('combined'));
 }
 
-// Static file serving with cache busting for development
+// Static file serving with iframe-friendly headers
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0',
   etag: false,
   setHeaders: (res, path) => {
+    // Explicitly allow iframe embedding from any origin
+    res.removeHeader('X-Frame-Options');
+    
     if (process.env.NODE_ENV === 'development') {
       res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.set('Pragma', 'no-cache');
@@ -184,6 +187,38 @@ app.get('/terms', (req, res) => {
 
 app.get('/contact', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'contact.html'));
+});
+
+// Iframe test route
+app.get('/iframe-test-simple', (req, res) => {
+  res.removeHeader('X-Frame-Options');
+  res.set('Content-Type', 'text/html');
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Iframe Test</title>
+        <style>
+            body { font-family: Arial, sans-serif; padding: 20px; background: #f0f8ff; }
+            .success { background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; }
+        </style>
+    </head>
+    <body>
+        <div class="success">
+            <h1>✅ SUCCESS!</h1>
+            <p>This page is loading in iframe successfully!</p>
+            <p>URL: ${req.url}</p>
+            <p>User-Agent: ${req.get('User-Agent') || 'Unknown'}</p>
+            <p>Referer: ${req.get('Referer') || 'None'}</p>
+            <p>Time: ${new Date().toISOString()}</p>
+        </div>
+        <script>
+            console.log('Iframe test page loaded');
+            console.log('In iframe:', window !== window.top);
+        </script>
+    </body>
+    </html>
+  `);
 });
 
 // Iframe-specific routes for HighLevel integration (authenticated app only)
