@@ -820,12 +820,12 @@ router.post('/register-after-payment', strictAuthLimiter, async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Account created successfully',
-      token: signInData.session.access_token,
+      message: 'Account created successfully. Please check your email to verify your account.',
       user: {
         id: authData.user.id,
         email: authData.user.email,
-        profile: profile
+        profile: profile,
+        emailConfirmed: authData.user?.email_confirmed_at ? true : false
       }
     });
 
