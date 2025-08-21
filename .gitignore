@@ -111,3 +111,4 @@ ecosystem.config.js
 # Temporary files
 tmp/
 temp/
+.vercel

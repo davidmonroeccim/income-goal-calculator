@@ -430,13 +430,14 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // Store token and redirect to dashboard
-                    localStorage.setItem('token', data.token);
-                    showMessage('success', 'Account created successfully! Redirecting to your dashboard...');
+                    showMessage('success', 'Account created successfully! Please check your email to verify your account, then log in to access your dashboard.');
+                    
+                    // Clear the form
+                    document.getElementById('registerForm').reset();
                     
                     setTimeout(() => {
-                        window.location.href = '/dashboard';
-                    }, 2000);
+                        window.location.href = '/login?message=registration_success';
+                    }, 4000);
                 } else {
                     showMessage('error', data.error || 'Failed to create account');
                     submitButton.disabled = false;
