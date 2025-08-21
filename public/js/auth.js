@@ -29,21 +29,22 @@ class AuthManager {
         // Check session on page load
         this.validateSession();
 
-        // Set up periodic session checks (every 15 minutes - less aggressive)
+        // Set up periodic session checks (every 1 hour - much less aggressive)
         this.sessionCheckInterval = setInterval(() => {
             this.validateSession();
-        }, 15 * 60 * 1000);
+        }, 60 * 60 * 1000);
 
         // Set up token refresh based on expiry
         this.scheduleTokenRefresh();
 
-        // Handle page visibility changes (less aggressive - only validate after longer absence)
+        // Handle page visibility changes (only validate after 1 hour of inactivity)
         let lastVisibilityChange = Date.now();
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
                 const timeSinceLastCheck = Date.now() - lastVisibilityChange;
-                // Only validate if user was away for more than 5 minutes
-                if (timeSinceLastCheck > 5 * 60 * 1000) {
+                // Only validate if user was away for more than 1 hour
+                if (timeSinceLastCheck > 60 * 60 * 1000) {
+                    console.log('User returned after 1+ hour, validating session');
                     this.validateSession();
                 }
                 lastVisibilityChange = Date.now();
@@ -87,7 +88,7 @@ class AuthManager {
         } catch (error) {
             console.error('Session validation error:', error);
             // Don't immediately logout on validation errors - token might still be valid
-            // Only logout if this is a critical error (like network is completely down)
+            // We only validate after 1 hour of inactivity, so be very lenient with errors
             
             // Try to gracefully handle the error
             try {
