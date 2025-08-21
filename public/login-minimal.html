@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Login Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .iframe-info {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div id="iframe-info" class="iframe-info">
+            Loading...
+        </div>
+        
+        <h1>Income Goal Calculator</h1>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit">Sign In</button>
+            </div>
+        </form>
+        
+        <p style="text-align: center; margin-top: 20px;">
+            <a href="/register">Don't have an account? Register</a>
+        </p>
+    </div>
+
+    <script>
+        // Simple iframe detection
+        const isIframe = window !== window.top;
+        const infoDiv = document.getElementById('iframe-info');
+        
+        if (isIframe) {
+            infoDiv.innerHTML = '✅ <strong>Success!</strong> This page is loading in an iframe. Iframe embedding is working!';
+            infoDiv.style.background = '#d4edda';
+            infoDiv.style.color = '#155724';
+        } else {
+            infoDiv.innerHTML = '📄 <strong>Standalone Mode:</strong> This page is not in an iframe (normal browser view).';
+        }
+        
+        // Simple form handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('This is just a test form. Iframe embedding is working if you can see this!');
+        });
+        
+        console.log('Minimal login test page loaded. In iframe:', isIframe);
+    </script>
+</body>
+</html>

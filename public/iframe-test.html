@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe Test - Income Goal Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h1>🖼️ Iframe Test Page</h1>
+        <p>This is a simple test page to verify iframe embedding works.</p>
+        
+        <div id="iframe-status" class="status info">
+            Checking iframe status...
+        </div>
+        
+        <div id="details" class="status info">
+            <strong>Page Details:</strong><br>
+            URL: <span id="current-url"></span><br>
+            Referrer: <span id="referrer"></span><br>
+            User Agent: <span id="user-agent"></span><br>
+            Iframe: <span id="is-iframe"></span><br>
+            Parent Origin: <span id="parent-origin"></span>
+        </div>
+
+        <div class="test-info">
+            <h2>Quick Tests:</h2>
+            <button onclick="testLogin()" style="margin: 5px; padding: 10px;">Test Login Page</button>
+            <button onclick="testCalculator()" style="margin: 5px; padding: 10px;">Test Calculator</button>
+            <button onclick="testDashboard()" style="margin: 5px; padding: 10px;">Test Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        function updateStatus() {
+            // Check if in iframe
+            const isIframe = window !== window.top;
+            const statusElement = document.getElementById('iframe-status');
+            
+            if (isIframe) {
+                statusElement.className = 'status success';
+                statusElement.innerHTML = '✅ SUCCESS: Page is loading in iframe!';
+            } else {
+                statusElement.className = 'status info';
+                statusElement.innerHTML = '📄 INFO: Page is loading standalone (not in iframe)';
+            }
+            
+            // Update details
+            document.getElementById('current-url').textContent = window.location.href;
+            document.getElementById('referrer').textContent = document.referrer || 'None';
+            document.getElementById('user-agent').textContent = navigator.userAgent.substring(0, 100) + '...';
+            document.getElementById('is-iframe').textContent = isIframe ? 'Yes' : 'No';
+            
+            // Try to get parent origin safely
+            let parentOrigin = 'Unknown';
+            if (isIframe) {
+                try {
+                    parentOrigin = document.referrer ? new URL(document.referrer).origin : 'Cross-origin';
+                } catch (e) {
+                    parentOrigin = 'Cross-origin';
+                }
+            }
+            document.getElementById('parent-origin').textContent = parentOrigin;
+        }
+        
+        function testLogin() {
+            if (window !== window.top) {
+                window.location.href = '/login';
+            } else {
+                window.open('/login', '_blank');
+            }
+        }
+        
+        function testCalculator() {
+            if (window !== window.top) {
+                window.location.href = '/calculator';
+            } else {
+                window.open('/calculator', '_blank');
+            }
+        }
+        
+        function testDashboard() {
+            if (window !== window.top) {
+                window.location.href = '/dashboard';
+            } else {
+                window.open('/dashboard', '_blank');
+            }
+        }
+        
+        // Update status when page loads
+        window.addEventListener('load', updateStatus);
+        
+        // Also update immediately
+        updateStatus();
+        
+        // Log iframe detection for debugging
+        console.log('🖼️ Iframe Test Page Loaded');
+        console.log('In iframe:', window !== window.top);
+        console.log('Referrer:', document.referrer);
+        console.log('Location:', window.location.href);
+    </script>
+</body>
+</html>
