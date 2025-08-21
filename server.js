@@ -17,10 +17,21 @@ const PORT = process.env.PORT || (process.env.NODE_ENV === 'production' ? 443 : 
 // Trust proxy (important for Hostgator VPS deployment)
 app.set('trust proxy', 1);
 
-// Security middleware - Temporarily disabled CSP for iframe testing
+// Security middleware - Iframe-friendly configuration
 app.use(helmet({
-  contentSecurityPolicy: false, // Temporarily disable CSP to test iframe embedding
-  frameguard: false, // Allow iframe embedding
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https://storage.googleapis.com", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://cdn.jsdelivr.net", "https://player.vimeo.com"],
+      connectSrc: ["'self'", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co", "https://api.stripe.com", "https://player.vimeo.com"],
+      frameSrc: ["'self'", "https://js.stripe.com", "https://player.vimeo.com"],
+      frameAncestors: ["'self'", "https://app.gohighlevel.com", "https://app2.gohighlevel.com", "https://highlevel.com", "https://*.gohighlevel.com", "https://app.acquisitionpro.io", "https://*.acquisitionpro.io"]
+    },
+  },
+  frameguard: false, // Disable frameguard to allow iframe embedding
   hsts: {
     maxAge: 31536000, // 1 year
     includeSubDomains: true,
