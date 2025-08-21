@@ -17,7 +17,7 @@ const PORT = process.env.PORT || (process.env.NODE_ENV === 'production' ? 443 : 
 // Trust proxy (important for Hostgator VPS deployment)
 app.set('trust proxy', 1);
 
-// Security middleware - Re-enabled for HTTPS production
+// Security middleware - Configured for iframe embedding in HighLevel
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -27,8 +27,12 @@ app.use(helmet({
       imgSrc: ["'self'", "data:", "https://storage.googleapis.com", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://cdn.jsdelivr.net", "https://player.vimeo.com"],
       connectSrc: ["'self'", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co", "https://api.stripe.com", "https://player.vimeo.com"],
-      frameSrc: ["'self'", "https://js.stripe.com", "https://player.vimeo.com"]
+      frameSrc: ["'self'", "https://js.stripe.com", "https://player.vimeo.com"],
+      frameAncestors: ["'self'", "https://app.gohighlevel.com", "https://app2.gohighlevel.com", "https://highlevel.com", "https://*.gohighlevel.com"]
     },
+  },
+  frameguard: {
+    action: 'sameorigin' // This will be overridden by CSP frameAncestors
   },
   hsts: {
     maxAge: 31536000, // 1 year

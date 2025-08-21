@@ -889,8 +889,13 @@
         }
 
         function initiateUpgrade() {
-            // For logged-in users, redirect to pricing page (which now preserves login state)
-            window.location.href = '/pricing';
+            // Check if in iframe mode and open pricing in new tab
+            if (window.iframeDetector && window.iframeDetector.isInIframe()) {
+                window.open('/pricing', '_blank', 'noopener,noreferrer');
+            } else {
+                // For standalone mode, redirect normally
+                window.location.href = '/pricing';
+            }
         }
 
         // Logout handler

@@ -164,9 +164,21 @@ class IframeDetector {
     // Prevent navigation that would break iframe context
     document.addEventListener('click', (e) => {
       const link = e.target.closest('a');
-      if (link && link.target === '_blank') {
-        e.preventDefault();
-        this.postMessageToParent('navigate', { url: link.href, target: '_blank' });
+      if (link) {
+        // Open pricing and marketing pages in new tab when in iframe
+        const href = link.getAttribute('href');
+        if (href && (href.includes('/pricing') || href.includes('/#') || href.startsWith('http'))) {
+          e.preventDefault();
+          // Open in new window/tab
+          window.open(link.href, '_blank', 'noopener,noreferrer');
+          return;
+        }
+        
+        // Handle existing target="_blank" links
+        if (link.target === '_blank') {
+          e.preventDefault();
+          this.postMessageToParent('navigate', { url: link.href, target: '_blank' });
+        }
       }
     });
 
