@@ -167,6 +167,14 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
+app.get('/login-minimal', (req, res) => {
+  res.removeHeader('X-Frame-Options');
+  res.set('X-Frame-Options', 'ALLOWALL');
+  res.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  res.set('Cross-Origin-Opener-Policy', 'unsafe-none');
+  res.sendFile(path.join(__dirname, 'public', 'login-minimal.html'));
+});
+
 app.get('/register', (req, res) => {
   res.removeHeader('X-Frame-Options');
   res.set('X-Frame-Options', 'ALLOWALL');

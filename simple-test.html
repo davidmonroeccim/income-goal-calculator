@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Iframe Test</title>
+</head>
+<body>
+    <h1>Iframe Test</h1>
+    <p>Testing iframe embedding:</p>
+    
+    <h2>Test Route (Should Work):</h2>
+    <iframe src="https://igc.acquisitionpro.io/iframe-test-simple" width="600" height="400" style="border:1px solid #ccc;"></iframe>
+    
+    <h2>Login Page (Testing):</h2>
+    <iframe src="https://igc.acquisitionpro.io/login" width="600" height="400" style="border:1px solid #ccc;"></iframe>
+    
+    <script>
+        console.log('Test page loaded');
+        
+        // Listen for any iframe errors
+        window.addEventListener('message', function(event) {
+            console.log('Message from iframe:', event.data);
+        });
+    </script>
+</body>
+</html>
