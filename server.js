@@ -28,7 +28,7 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://cdn.jsdelivr.net", "https://player.vimeo.com"],
       connectSrc: ["'self'", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co", "https://api.stripe.com", "https://player.vimeo.com"],
       frameSrc: ["'self'", "https://js.stripe.com", "https://player.vimeo.com"],
-      frameAncestors: ["'self'", "https://app.gohighlevel.com", "https://app2.gohighlevel.com", "https://highlevel.com", "https://*.gohighlevel.com", "https://app.acquisitionpro.io", "https://*.acquisitionpro.io"]
+      frameAncestors: ["*"]
     },
   },
   frameguard: false, // Disable frameguard to allow iframe embedding
@@ -58,10 +58,20 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// CORS configuration
+// CORS configuration - Include HighLevel domains for iframe embedding
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://acquisitionpro.io', 'https://www.acquisitionpro.io', 'https://igc.acquisitionpro.io', 'http://igc.acquisitionpro.io', 'http://igc.acquisitionpro.io:3000']
+    ? [
+        'https://acquisitionpro.io', 
+        'https://www.acquisitionpro.io', 
+        'https://igc.acquisitionpro.io', 
+        'http://igc.acquisitionpro.io', 
+        'http://igc.acquisitionpro.io:3000',
+        'https://app.gohighlevel.com',
+        'https://app2.gohighlevel.com',
+        'https://highlevel.com',
+        'https://app.acquisitionpro.io'
+      ]
     : ['http://localhost:3000', 'https://localhost:3000'],
   credentials: true
 }));
@@ -111,9 +121,14 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0',
   etag: false,
-  setHeaders: (res, path) => {
-    // Explicitly allow iframe embedding from any origin
+  setHeaders: (res, filePath) => {
+    // Explicitly allow iframe embedding from HighLevel and other authorized origins
     res.removeHeader('X-Frame-Options');
+    res.set('X-Frame-Options', 'ALLOWALL');
+    
+    // Additional iframe-friendly headers
+    res.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
+    res.set('Cross-Origin-Opener-Policy', 'unsafe-none');
     
     if (process.env.NODE_ENV === 'development') {
       res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -156,14 +171,26 @@ app.get('/pricing', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
+  res.removeHeader('X-Frame-Options');
+  res.set('X-Frame-Options', 'ALLOWALL');
+  res.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  res.set('Cross-Origin-Opener-Policy', 'unsafe-none');
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 app.get('/register', (req, res) => {
+  res.removeHeader('X-Frame-Options');
+  res.set('X-Frame-Options', 'ALLOWALL');
+  res.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  res.set('Cross-Origin-Opener-Policy', 'unsafe-none');
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
 app.get('/register-success', (req, res) => {
+  res.removeHeader('X-Frame-Options');
+  res.set('X-Frame-Options', 'ALLOWALL');
+  res.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  res.set('Cross-Origin-Opener-Policy', 'unsafe-none');
   res.sendFile(path.join(__dirname, 'public', 'register-success.html'));
 });
 
@@ -172,14 +199,26 @@ app.get('/reset-password', (req, res) => {
 });
 
 app.get('/app', (req, res) => {
+  res.removeHeader('X-Frame-Options');
+  res.set('X-Frame-Options', 'ALLOWALL');
+  res.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  res.set('Cross-Origin-Opener-Policy', 'unsafe-none');
   res.sendFile(path.join(__dirname, 'public', 'app.html'));
 });
 
 app.get('/profile', (req, res) => {
+  res.removeHeader('X-Frame-Options');
+  res.set('X-Frame-Options', 'ALLOWALL');
+  res.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  res.set('Cross-Origin-Opener-Policy', 'unsafe-none');
   res.sendFile(path.join(__dirname, 'public', 'profile.html'));
 });
 
 app.get('/activities', (req, res) => {
+  res.removeHeader('X-Frame-Options');
+  res.set('X-Frame-Options', 'ALLOWALL');
+  res.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  res.set('Cross-Origin-Opener-Policy', 'unsafe-none');
   res.sendFile(path.join(__dirname, 'public', 'activities.html'));
 });
 
