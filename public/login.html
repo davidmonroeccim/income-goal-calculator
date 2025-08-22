@@ -499,7 +499,28 @@
         });
     </script>
 
-    <!-- Iframe Detection -->
-    <script src="/js/iframe-detector.js"></script>
+    <!-- Simple Iframe Detection for Testing -->
+    <script>
+        // Simple iframe detection without complex iframe-detector
+        if (window !== window.top) {
+            console.log('Login page loaded in iframe - iframe embedding working!');
+            document.body.classList.add('iframe-mode');
+            
+            // Add simple styling for iframe
+            const style = document.createElement('style');
+            style.textContent = `
+                body.iframe-mode {
+                    margin: 0;
+                    padding: 10px;
+                }
+                .iframe-mode .auth-form-container {
+                    max-width: none;
+                    margin: 0;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    </script>
+    <!-- <script src="/js/iframe-detector.js"></script> --> <!-- Temporarily disabled for iframe testing -->
 </body>
 </html>
