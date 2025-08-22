@@ -4,10 +4,10 @@ const { supabase, createUserProfile, getUserByEmail, updateUserProfile } = requi
 const { createOrUpdateContact } = require('../services/highlevel');
 const rateLimit = require('express-rate-limit');
 
-// Stricter rate limiting for auth endpoints
+// Stricter rate limiting for auth endpoints (increased for testing)
 const strictAuthLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 6, // limit each IP to 6 requests per windowMs for auth
+  max: 25, // Increased from 6 to 25 attempts for development/testing
   message: {
     error: 'Too many authentication attempts, please try again in 15 minutes.',
     code: 'RATE_LIMIT_EXCEEDED'

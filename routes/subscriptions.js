@@ -77,9 +77,9 @@ router.post('/checkout', requireAuth, async (req, res) => {
       });
     }
 
-    // Create URLs
+    // Create URLs - redirect authenticated users to app after upgrade
     const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-    const successUrl = `${baseUrl}/subscription-success?session_id={CHECKOUT_SESSION_ID}`;
+    const successUrl = `${baseUrl}/app?upgrade_success=1&session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${baseUrl}/pricing?canceled=1`;
 
     const session = await createCheckoutSession(
