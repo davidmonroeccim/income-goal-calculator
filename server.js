@@ -185,6 +185,51 @@ app.get('/api/debug/user/:email', async (req, res) => {
   }
 });
 
+// Debug endpoint to check subscription status API result
+app.get('/api/debug/subscription-status/:email', async (req, res) => {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const { getSubscriptionStatus } = require('./services/stripe');
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_KEY
+    );
+    
+    const email = req.params.email.toLowerCase();
+    
+    // Get user ID
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('id, subscription_status')
+      .eq('email', email)
+      .single();
+    
+    if (userError || !user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+    
+    // Get subscription status using the API function
+    const subscriptionStatus = await getSubscriptionStatus(user.id);
+    
+    res.json({
+      success: true,
+      user_id: user.id,
+      database_status: user.subscription_status,
+      api_result: subscriptionStatus
+    });
+    
+  } catch (error) {
+    console.error('Subscription status check error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Manual fix endpoint for subscription issues
 app.post('/api/debug/fix-subscription/:email', async (req, res) => {
   try {
