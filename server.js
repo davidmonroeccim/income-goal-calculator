@@ -17,20 +17,9 @@ const PORT = process.env.PORT || (process.env.NODE_ENV === 'production' ? 443 : 
 // Trust proxy (important for Hostgator VPS deployment)
 app.set('trust proxy', 1);
 
-// Security middleware - Iframe-friendly configuration
+// Security middleware - Iframe-friendly configuration (CSP disabled for iframe testing)
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https://storage.googleapis.com", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com", "https://cdn.jsdelivr.net", "https://player.vimeo.com"],
-      connectSrc: ["'self'", "https://jkwkrtnwdlyxhiqdmbtm.supabase.co", "https://api.stripe.com", "https://player.vimeo.com"],
-      frameSrc: ["'self'", "https://js.stripe.com", "https://player.vimeo.com"],
-      frameAncestors: ["*"]
-    },
-  },
+  contentSecurityPolicy: false, // Disable CSP entirely for iframe testing
   frameguard: false, // Disable frameguard to allow iframe embedding
   hsts: {
     maxAge: 31536000, // 1 year
@@ -239,15 +228,27 @@ app.get('/contact', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'contact.html'));
 });
 
-// Iframe test route
+// Iframe test route - Ultra permissive for testing
 app.get('/iframe-test-simple', (req, res) => {
+  // Remove all security headers
   res.removeHeader('X-Frame-Options');
+  res.removeHeader('Content-Security-Policy');
+  res.removeHeader('X-Content-Type-Options');
+  res.removeHeader('Referrer-Policy');
+  
+  // Add permissive headers
   res.set('Content-Type', 'text/html');
+  res.set('Cache-Control', 'no-cache');
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Headers', '*');
+  res.set('Access-Control-Allow-Methods', '*');
+  
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
         <title>Iframe Test</title>
+        <meta charset="UTF-8">
         <style>
             body { font-family: Arial, sans-serif; padding: 20px; background: #f0f8ff; }
             .success { background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; }
@@ -261,10 +262,13 @@ app.get('/iframe-test-simple', (req, res) => {
             <p>User-Agent: ${req.get('User-Agent') || 'Unknown'}</p>
             <p>Referer: ${req.get('Referer') || 'None'}</p>
             <p>Time: ${new Date().toISOString()}</p>
+            <p>In iframe: <span id="iframe-status">checking...</span></p>
         </div>
         <script>
             console.log('Iframe test page loaded');
-            console.log('In iframe:', window !== window.top);
+            const inIframe = window !== window.top;
+            console.log('In iframe:', inIframe);
+            document.getElementById('iframe-status').textContent = inIframe ? 'YES' : 'NO';
         </script>
     </body>
     </html>

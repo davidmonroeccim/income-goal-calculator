@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe Embedding Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #007bff;
+            border-radius: 4px;
+        }
+        .test-links {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        .test-links button {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-links button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🖼️ HighLevel Iframe Embedding Test</h1>
+        <p>Testing if Income Goal Calculator app pages load in iframe (simulating HighLevel environment)</p>
+        
+        <div class="test-links">
+            <button onclick="loadPage('/login')">Login</button>
+            <button onclick="loadPage('/register')">Register</button>
+            <button onclick="loadPage('/app')">Dashboard</button>
+            <button onclick="loadPage('/calculator')">Calculator</button>
+            <button onclick="loadPage('/activities')">Activities</button>
+            <button onclick="loadPage('/profile')">Profile</button>
+            <button onclick="loadPage('/iframe-test-simple')">Test Route</button>
+        </div>
+        
+        <div id="status" style="margin: 10px 0; padding: 10px; border-radius: 4px;">
+            Ready to test
+        </div>
+        
+        <iframe id="testFrame" src="https://igc.acquisitionpro.io/iframe-test-simple"></iframe>
+    </div>
+
+    <script>
+        function loadPage(path) {
+            const iframe = document.getElementById('testFrame');
+            const status = document.getElementById('status');
+            
+            status.innerHTML = `🔄 Loading: ${path}`;
+            status.style.background = '#fff3cd';
+            status.style.color = '#856404';
+            
+            iframe.src = `https://igc.acquisitionpro.io${path}`;
+            
+            iframe.onload = function() {
+                status.innerHTML = `✅ Loaded: ${path}`;
+                status.style.background = '#d4edda';
+                status.style.color = '#155724';
+            };
+            
+            iframe.onerror = function() {
+                status.innerHTML = `❌ Failed to load: ${path}`;
+                status.style.background = '#f8d7da';
+                status.style.color = '#721c24';
+            };
+        }
+        
+        // Load test route by default
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('status').innerHTML = '✅ Test route loaded successfully';
+                document.getElementById('status').style.background = '#d4edda';
+                document.getElementById('status').style.color = '#155724';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
