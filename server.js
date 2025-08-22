@@ -185,6 +185,90 @@ app.get('/api/debug/user/:email', async (req, res) => {
   }
 });
 
+// Manual fix endpoint for subscription issues
+app.post('/api/debug/fix-subscription/:email', async (req, res) => {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const { trackSubscriptionEvent } = require('./services/highlevel');
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_KEY
+    );
+    
+    const email = req.params.email.toLowerCase();
+    const { subscription_status, stripe_customer_id } = req.body;
+    
+    // Get user
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+    
+    if (userError || !user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+    
+    // Update user subscription
+    const { data: updatedUser, error: updateError } = await supabase
+      .from('users')
+      .update({ 
+        subscription_status: subscription_status,
+        stripe_customer_id: stripe_customer_id || null,
+        subscription_ends_at: subscription_status === 'lifetime' ? null : user.subscription_ends_at,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', user.id)
+      .select()
+      .single();
+    
+    // Add subscription event record
+    const { data: eventRecord } = await supabase
+      .from('subscription_events')
+      .insert({
+        user_id: user.id,
+        stripe_customer_id: stripe_customer_id || null,
+        stripe_subscription_id: null,
+        plan_type: subscription_status,
+        event_type: 'manual_fix',
+        event_data: { 
+          fixed_by: 'admin', 
+          original_status: user.subscription_status,
+          new_status: subscription_status
+        }
+      })
+      .select()
+      .single();
+    
+    // Update HighLevel tag
+    let highlevelResult = null;
+    try {
+      highlevelResult = await trackSubscriptionEvent(email, subscription_status, 'active');
+    } catch (highlevelError) {
+      console.error('HighLevel update failed:', highlevelError.message);
+      highlevelResult = { error: highlevelError.message };
+    }
+    
+    res.json({
+      success: true,
+      message: 'Subscription fixed manually',
+      user: updatedUser,
+      subscription_event: eventRecord,
+      highlevel_result: highlevelResult
+    });
+    
+  } catch (error) {
+    console.error('Manual fix error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Serve main application pages
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
