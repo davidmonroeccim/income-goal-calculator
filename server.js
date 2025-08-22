@@ -146,6 +146,45 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Debug endpoint to check user subscription status
+app.get('/api/debug/user/:email', async (req, res) => {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_KEY
+    );
+    
+    const email = req.params.email.toLowerCase();
+    
+    // Get user data
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+    
+    // Get subscription events
+    const { data: events, error: eventsError } = await supabase
+      .from('subscription_events')
+      .select('*')
+      .eq('user_id', user?.id)
+      .order('created_at', { ascending: false });
+    
+    res.json({
+      success: true,
+      user: user,
+      subscription_events: events,
+      errors: { userError, eventsError }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Serve main application pages
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
