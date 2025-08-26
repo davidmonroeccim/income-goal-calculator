@@ -17,7 +17,14 @@ class AuthManager {
 
     init() {
         if (typeof window.supabase !== 'undefined') {
-            this.supabase = window.supabase.createClient(this.supabaseUrl, this.supabaseAnonKey);
+            // Use global supabase client if it exists, otherwise create one
+            if (!window._globalSupabaseClient) {
+                window._globalSupabaseClient = window.supabase.createClient(this.supabaseUrl, this.supabaseAnonKey);
+                console.log('🔧 Created global Supabase client');
+            } else {
+                console.log('🔧 Using existing global Supabase client');
+            }
+            this.supabase = window._globalSupabaseClient;
             this.startSessionManagement();
         } else {
             console.warn('Supabase client not available');
@@ -402,8 +409,13 @@ class AuthManager {
     }
 }
 
-// Initialize global auth manager
-window.authManager = new AuthManager();
+// Initialize global auth manager as singleton
+if (!window.authManager) {
+    console.log('🔧 Creating new AuthManager instance');
+    window.authManager = new AuthManager();
+} else {
+    console.log('🔧 Using existing AuthManager instance');
+}
 
 // Global helper functions
 window.logout = () => {
