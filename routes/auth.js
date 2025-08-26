@@ -4,10 +4,10 @@ const { supabase, createUserProfile, getUserByEmail, updateUserProfile } = requi
 const { createOrUpdateContact } = require('../services/highlevel');
 const rateLimit = require('express-rate-limit');
 
-// Stricter rate limiting for auth endpoints (increased for testing)
+// Stricter rate limiting for auth endpoints (temporarily relaxed for debugging)
 const strictAuthLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 25, // Increased from 6 to 25 attempts for development/testing
+  max: 100, // Temporarily increased to 100 for debugging navigation issues
   message: {
     error: 'Too many authentication attempts, please try again in 15 minutes.',
     code: 'RATE_LIMIT_EXCEEDED'
@@ -159,6 +159,7 @@ router.post('/register', strictAuthLimiter, async (req, res) => {
 // Login endpoint
 router.post('/login', strictAuthLimiter, async (req, res) => {
   try {
+    console.log('🔐 Login attempt for:', req.body?.email, 'IP:', req.ip, 'Time:', new Date().toISOString());
     const { email, password, rememberMe } = req.body;
 
     // Input validation
