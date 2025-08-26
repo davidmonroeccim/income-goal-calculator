@@ -316,8 +316,15 @@
         // Authentication initialization
         async function initializeAuth() {
             // Wait for auth manager to be available
+            let attempts = 0;
+            while (!window.authManager && attempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
             if (!window.authManager) {
-                setTimeout(initializeAuth, 100);
+                console.error('Auth manager not available');
+                redirectToLogin();
                 return;
             }
 
@@ -358,7 +365,9 @@
 
         // Load user profile data
         async function loadUserProfile() {
+            console.log('Loading user profile, currentUser:', currentUser);
             if (!currentUser || !currentUser.profile) {
+                console.error('Current user or profile not available:', { currentUser });
                 showMessage('Failed to load profile data', 'error', messageContainer);
                 return;
             }
