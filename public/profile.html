@@ -308,17 +308,35 @@
 
         // Initialize page
         window.addEventListener('DOMContentLoaded', async function() {
-            // Wait for auth manager to be ready
-            await waitForAuthManager();
+            console.log('🔧 Profile page DOM loaded');
             
-            if (!window.authManager.isAuthenticated()) {
-                window.authManager.redirectToLogin();
-                return;
+            try {
+                // Wait for auth manager to be ready
+                console.log('🔧 Waiting for auth manager...');
+                await waitForAuthManager();
+                console.log('🔧 Auth manager ready');
+                
+                if (!window.authManager.isAuthenticated()) {
+                    console.log('🔧 Not authenticated, redirecting...');
+                    window.authManager.redirectToLogin();
+                    return;
+                }
+                console.log('🔧 User is authenticated');
+                
+                console.log('🔧 Initializing user...');
+                await initializeUser();
+                console.log('🔧 User initialized, currentUser:', !!currentUser);
+                
+                console.log('🔧 Setting up event listeners...');
+                setupEventListeners();
+                
+                console.log('🔧 Loading user profile...');
+                await loadUserProfile();
+                console.log('🔧 Profile page initialization complete');
+                
+            } catch (error) {
+                console.error('🔧 Profile page initialization error:', error);
             }
-            
-            await initializeUser();
-            setupEventListeners();
-            await loadUserProfile();
         });
 
         // Wait for auth manager to be available
@@ -399,8 +417,8 @@
                 userTypeText.textContent = 'Real Estate Broker/Agent';
             }
 
-            // Load subscription status from API
-            await loadSubscriptionStatus();
+            // Load subscription status from API - TEMPORARILY DISABLED FOR DEBUGGING
+            // await loadSubscriptionStatus();
 
             // Check email verification status
             updateEmailVerificationStatus(profile.email_verified);
