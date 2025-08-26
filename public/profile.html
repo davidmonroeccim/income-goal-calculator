@@ -294,11 +294,6 @@
 
     <!-- JavaScript -->
     <script>
-        // Initialize Supabase client
-        const supabaseUrl = 'https://jkwkrtnwdlyxhiqdmbtm.supabase.co';
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imprd2tydG53ZGx5eGhpcWRtYnRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2MTgyMDYsImV4cCI6MjA3MTE5NDIwNn0.AIR6IH6XruUiTMNczYDb9twFb6pvFgeQTTNYmuRt5oU';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-
         // Global state
         let currentUser = null;
         let accessToken = null;
@@ -320,33 +315,25 @@
 
         // Authentication initialization
         async function initializeAuth() {
-            accessToken = localStorage.getItem('access_token');
-            
-            if (!accessToken) {
+            // Wait for auth manager to be available
+            if (!window.authManager) {
+                setTimeout(initializeAuth, 100);
+                return;
+            }
+
+            // Check authentication using auth manager
+            if (!window.authManager.isAuthenticated()) {
                 redirectToLogin();
                 return;
             }
 
+            accessToken = window.authManager.getAccessToken();
+
             try {
-                const response = await fetch('/api/auth/profile', {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                });
-
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        redirectToLogin();
-                        return;
-                    }
-                    throw new Error('Failed to fetch profile');
-                }
-
-                const result = await response.json();
-                currentUser = result.user;
+                currentUser = await window.authManager.getCurrentUser();
                 
                 // Update user greeting
-                if (currentUser.profile) {
+                if (currentUser && currentUser.profile) {
                     userGreeting.textContent = `Hello, ${currentUser.profile.first_name}!`;
                 } else {
                     userGreeting.textContent = 'Hello!';
@@ -359,9 +346,13 @@
         }
 
         function redirectToLogin() {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            localStorage.removeItem('user_profile');
+            if (window.authManager) {
+                window.authManager.clearTokens();
+            } else {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('user_profile');
+            }
             window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
         }
 
@@ -457,9 +448,8 @@
         // Subscription management functions
         async function loadSubscriptionStatus() {
             try {
-                const response = await fetch('/api/subscriptions/status', {
+                const response = await window.authManager.makeAuthenticatedRequest('/api/subscriptions/status', {
                     headers: {
-                        'Authorization': `Bearer ${accessToken}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -538,10 +528,9 @@
                 button.disabled = true;
                 button.textContent = 'Opening...';
 
-                const response = await fetch('/api/subscriptions/billing-portal', {
+                const response = await window.authManager.makeAuthenticatedRequest('/api/subscriptions/billing-portal', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${accessToken}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -568,10 +557,9 @@
             }
 
             try {
-                const response = await fetch('/api/subscriptions/cancel', {
+                const response = await window.authManager.makeAuthenticatedRequest('/api/subscriptions/cancel', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${accessToken}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -592,26 +580,10 @@
 
         // Event handlers
         async function handleLogout() {
-            try {
-                // Call logout endpoint
-                await fetch('/api/auth/logout', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                });
-
-                // Clear local storage
-                localStorage.removeItem('access_token');
-                localStorage.removeItem('refresh_token');
-                localStorage.removeItem('user_profile');
-
-                // Redirect to login
-                window.location.href = '/login';
-
-            } catch (error) {
-                console.error('Logout error:', error);
-                // Still clear local storage and redirect
+            if (window.authManager) {
+                await window.authManager.handleLogout();
+            } else {
+                // Fallback if auth manager not available
                 localStorage.clear();
                 window.location.href = '/login';
             }
@@ -634,11 +606,10 @@
                     last_name: formData.get('lastName').trim()
                 };
 
-                const response = await fetch('/api/auth/profile', {
+                const response = await window.authManager.makeAuthenticatedRequest('/api/auth/profile', {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(updateData)
                 });
@@ -729,11 +700,7 @@
 
         async function handleExportData() {
             try {
-                const response = await fetch('/api/user/export', {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                });
+                const response = await window.authManager.makeAuthenticatedRequest('/api/user/export');
 
                 if (response.ok) {
                     const blob = await response.blob();
