@@ -171,31 +171,38 @@ router.post('/billing-portal', requireAuth, async (req, res) => {
   }
 });
 
-// Stripe webhook endpoint
+// Stripe webhook endpoint with enhanced logging
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   try {
+    console.log('🔔 Webhook received at:', new Date().toISOString());
+    console.log('🔔 Headers:', JSON.stringify(req.headers, null, 2));
+    console.log('🔔 Body length:', req.body ? req.body.length : 'no body');
+    
     const sig = req.headers['stripe-signature'];
     const { stripe } = require('../services/stripe');
     
     // Skip webhook verification if no secret is configured (for testing)
     if (!process.env.STRIPE_WEBHOOK_SECRET) {
-      console.log('Webhook secret not configured, skipping verification');
+      console.log('⚠️ Webhook secret not configured, skipping verification');
       return res.json({ received: true, message: 'Webhook secret not configured' });
     }
     
     let event;
     try {
       event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+      console.log('✅ Webhook verification successful, event type:', event.type);
     } catch (err) {
-      console.error('Webhook signature verification failed:', err.message);
+      console.error('❌ Webhook signature verification failed:', err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
+    console.log('🎯 Processing webhook event:', event.type);
     await handleWebhookEvent(event);
+    console.log('✅ Webhook processing completed successfully');
     
     res.json({ received: true });
   } catch (error) {
-    console.error('Error handling webhook:', error);
+    console.error('❌ Error handling webhook:', error);
     res.status(500).json({
       success: false,
       error: 'Webhook handling failed'
