@@ -556,7 +556,7 @@
             }
         }
 
-        async function openBillingPortal() {
+        async function openBillingPortal(event) {
             try {
                 const button = event.target;
                 const originalText = button.textContent;
@@ -581,8 +581,8 @@
                 console.error('Error opening billing portal:', error);
                 alert('An error occurred. Please try again.');
             } finally {
-                event.target.disabled = false;
-                event.target.textContent = '📄 Manage Billing';
+                button.disabled = false;
+                button.textContent = '📄 Manage Billing';
             }
         }
 
