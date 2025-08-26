@@ -370,8 +370,14 @@
         // Authentication initialization
         async function initializeAuth() {
             // Wait for auth manager to be available
+            let attempts = 0;
+            while (!window.authManager && attempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
             if (!window.authManager) {
-                setTimeout(initializeAuth, 100);
+                console.log('Auth manager not available - running in guest mode');
                 return;
             }
 
@@ -395,7 +401,8 @@
 
             } catch (error) {
                 console.error('Auth initialization error:', error);
-                redirectToLogin();
+                // Don't redirect to login for calculator - just run in guest mode
+                console.log('Running calculator in guest mode due to auth error');
             }
         }
 
