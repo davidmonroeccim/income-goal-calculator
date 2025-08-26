@@ -483,9 +483,9 @@
         // Subscription management functions
         async function loadSubscriptionStatus() {
             try {
-                const response = await window.authManager.makeAuthenticatedRequest('/api/subscriptions/status', {
+                const response = await window.authManager.makeAuthenticatedRequest(`/api/subscriptions/status?_t=${Date.now()}`, {
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Cache-Control': 'no-cache'
                     }
                 });
 
