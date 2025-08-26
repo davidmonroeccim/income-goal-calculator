@@ -308,34 +308,25 @@
 
         // Initialize page
         window.addEventListener('DOMContentLoaded', async function() {
-            await initializeAuth();
-            await loadUserProfile();
-            setupEventListeners();
-        });
-
-        // Authentication initialization
-        async function initializeAuth() {
-            // Wait for auth manager to be available
-            let attempts = 0;
-            while (!window.authManager && attempts < 50) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                attempts++;
+            // Wait for auth manager to be ready (same pattern as activities.html)
+            if (window.authManager && !window.authManager.isAuthenticated()) {
+                window.authManager.redirectToLogin();
+                return;
             }
             
-            if (!window.authManager) {
-                console.error('Auth manager not available');
-                redirectToLogin();
-                return;
-            }
+            await initializeUser();
+            setupEventListeners();
+            await loadUserProfile();
+        });
 
-            // Check authentication using auth manager
-            if (!window.authManager.isAuthenticated()) {
-                redirectToLogin();
-                return;
-            }
-
+        // Authentication initialization (similar to activities.html)
+        async function initializeUser() {
             accessToken = window.authManager.getAccessToken();
-
+            
+            if (!accessToken) {
+                return;
+            }
+            
             try {
                 currentUser = await window.authManager.getCurrentUser();
                 
@@ -345,10 +336,8 @@
                 } else {
                     userGreeting.textContent = 'Hello!';
                 }
-
             } catch (error) {
-                console.error('Auth initialization error:', error);
-                redirectToLogin();
+                console.error('User initialization error:', error);
             }
         }
 
@@ -368,7 +357,7 @@
             console.log('Loading user profile, currentUser:', currentUser);
             if (!currentUser || !currentUser.profile) {
                 console.error('Current user or profile not available:', { currentUser });
-                showMessage('Failed to load profile data', 'error', messageContainer);
+                // Don't show error message, just return - user might not be fully loaded yet
                 return;
             }
 
