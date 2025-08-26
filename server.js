@@ -185,6 +185,29 @@ app.get('/api/debug/user/:email', async (req, res) => {
   }
 });
 
+// Debug endpoint to test authenticated subscription status (temporary)
+app.get('/api/debug/auth-subscription/:userId', async (req, res) => {
+  try {
+    const { getSubscriptionStatus } = require('./services/stripe');
+    const userId = req.params.userId;
+    
+    // Get subscription status using the API function
+    const subscriptionStatus = await getSubscriptionStatus(userId);
+    
+    res.json({
+      success: true,
+      subscription: subscriptionStatus
+    });
+    
+  } catch (error) {
+    console.error('Auth subscription check error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Debug endpoint to check subscription status API result
 app.get('/api/debug/subscription-status/:email', async (req, res) => {
   try {

@@ -888,13 +888,60 @@
             document.getElementById('upgradeModal').style.display = 'none';
         }
 
-        function initiateUpgrade() {
-            // Check if in iframe mode and open pricing in new tab
-            if (window.iframeDetector && window.iframeDetector.isInIframe()) {
-                window.open('/pricing', '_blank', 'noopener,noreferrer');
+        async function initiateUpgrade() {
+            console.log('=== INITIATING UPGRADE FROM ACTIVITIES PAGE ===');
+            
+            // Check authentication status first
+            const isAuth = window.authManager && window.authManager.isAuthenticated();
+            console.log('User authenticated:', isAuth);
+            
+            if (isAuth) {
+                // For authenticated users, directly start checkout for lifetime plan
+                console.log('Starting direct authenticated checkout for lifetime plan');
+                await startAuthenticatedCheckout('lifetime');
             } else {
-                // For standalone mode, redirect normally
-                window.location.href = '/pricing';
+                console.log('User not authenticated, redirecting to pricing page');
+                // Check if in iframe mode and open pricing in new tab
+                if (window.iframeDetector && window.iframeDetector.isInIframe()) {
+                    window.open('/pricing', '_blank', 'noopener,noreferrer');
+                } else {
+                    // For standalone mode, redirect normally
+                    window.location.href = '/pricing';
+                }
+            }
+        }
+        
+        async function startAuthenticatedCheckout(planType) {
+            try {
+                console.log('Creating authenticated checkout session for plan:', planType);
+                
+                const response = await window.authManager.makeAuthenticatedRequest('/api/subscriptions/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ planType })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Checkout response:', data);
+                    
+                    if (data.success && data.checkoutUrl) {
+                        console.log('Redirecting to checkout:', data.checkoutUrl);
+                        window.location.href = data.checkoutUrl;
+                    } else {
+                        console.error('Checkout failed:', data.error);
+                        alert('Failed to start checkout: ' + (data.error || 'Unknown error'));
+                    }
+                } else {
+                    const errorData = await response.json();
+                    console.error('Checkout request failed:', errorData);
+                    alert('Failed to start checkout. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error starting authenticated checkout:', error);
+                alert('An error occurred. Please try again.');
             }
         }
 
