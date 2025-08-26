@@ -308,8 +308,10 @@
 
         // Initialize page
         window.addEventListener('DOMContentLoaded', async function() {
-            // Wait for auth manager to be ready (same pattern as activities.html)
-            if (window.authManager && !window.authManager.isAuthenticated()) {
+            // Wait for auth manager to be ready
+            await waitForAuthManager();
+            
+            if (!window.authManager.isAuthenticated()) {
                 window.authManager.redirectToLogin();
                 return;
             }
@@ -319,11 +321,27 @@
             await loadUserProfile();
         });
 
+        // Wait for auth manager to be available
+        async function waitForAuthManager() {
+            let attempts = 0;
+            while (!window.authManager && attempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (!window.authManager) {
+                console.error('Auth manager not available after waiting');
+                redirectToLogin();
+                throw new Error('Auth manager not available');
+            }
+        }
+
         // Authentication initialization (similar to activities.html)
         async function initializeUser() {
             accessToken = window.authManager.getAccessToken();
             
             if (!accessToken) {
+                redirectToLogin();
                 return;
             }
             
@@ -338,6 +356,7 @@
                 }
             } catch (error) {
                 console.error('User initialization error:', error);
+                redirectToLogin();
             }
         }
 
