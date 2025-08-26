@@ -146,10 +146,10 @@ router.post('/billing-portal', requireAuth, async (req, res) => {
       .eq('id', userId)
       .single();
 
-    if (!user?.stripe_customer_id) {
+    if (!user?.stripe_customer_id || user.stripe_customer_id === 'temp_customer') {
       return res.status(400).json({
         success: false,
-        error: 'No active subscription found'
+        error: 'No billing portal available for this account type'
       });
     }
 

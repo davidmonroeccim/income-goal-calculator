@@ -570,12 +570,20 @@
                     }
                 });
 
-                const data = await response.json();
-                
-                if (data.success && data.portalUrl) {
-                    window.open(data.portalUrl, '_blank');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.portalUrl) {
+                        window.open(data.portalUrl, '_blank');
+                    } else {
+                        alert(data.error || 'Unable to open billing portal. Please try again.');
+                    }
                 } else {
-                    alert('Unable to open billing portal. Please try again.');
+                    const data = await response.json();
+                    if (response.status === 400) {
+                        alert(data.error || 'Billing portal not available for this account type.');
+                    } else {
+                        alert('Unable to open billing portal. Please try again.');
+                    }
                 }
             } catch (error) {
                 console.error('Error opening billing portal:', error);
