@@ -262,7 +262,7 @@
                 button.textContent = 'Processing...';
                 button.disabled = true;
                 
-                const response = await fetch('/api/subscription/guest-checkout', {
+                const response = await fetch('/api/subscriptions/guest-checkout', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
