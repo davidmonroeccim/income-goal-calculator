@@ -11,7 +11,7 @@
 .hero {
   background: var(--bg-brand-gradient);
   color: var(--white);
-  padding: var(--spacing-2xl) 0;
+  padding: var(--spacing-lg) 0 var(--spacing-xl) 0;
   position: relative;
   overflow: hidden;
 }
@@ -27,14 +27,32 @@
   opacity: 0.3;
 }
 
+.hero-full-width {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.hero-full-width .hero-headline {
+  font-size: var(--font-size-4xl);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--white);
+  text-shadow: 
+    2px 2px 4px rgba(0, 0, 0, 0.6),
+    1px 1px 2px rgba(0, 0, 0, 0.8);
+  margin-bottom: 0;
+}
+
 .hero-grid {
   position: relative;
   z-index: 2;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-3xl);
+  gap: var(--spacing-2xl);
   align-items: center;
-  min-height: 600px;
+  min-height: 400px;
 }
 
 .hero-content {
@@ -219,6 +237,18 @@
 .feature-card h3 {
   color: var(--primary-navy);
   margin-bottom: var(--spacing-md);
+}
+
+.feature-highlight.feature-free {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+  font-weight: 600;
+}
+
+.feature-highlight.feature-pro {
+  background: linear-gradient(135deg, var(--secondary-blue) 0%, #1E40AF 100%);
+  color: white;
+  font-weight: 600;
 }
 
 /* Testimonials */
@@ -426,7 +456,7 @@
 /* Page Title Section */
 .page-title-section {
   background: var(--gray-50);
-  padding: 80px 0 var(--spacing-lg);
+  padding: var(--spacing-lg) 0 var(--spacing-md);
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -607,10 +637,28 @@
   font-size: var(--font-size-lg);
 }
 
-.hero-note {
-  margin-top: var(--spacing-lg);
+.hero-cta .hero-note {
+  margin-top: var(--spacing-xs);
   color: rgba(255, 255, 255, 0.8);
   font-size: var(--font-size-sm);
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.hero-full-width-bottom {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin-top: var(--spacing-lg);
+}
+
+.hero-full-width-bottom .hero-trust {
+  font-size: var(--font-size-xl);
+  color: var(--accent-yellow);
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Enhanced Features */
