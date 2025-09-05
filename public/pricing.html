@@ -50,27 +50,105 @@
         </div>
     </section>
 
-    <!-- Hero Section -->
-    <section class="hero" style="padding: var(--spacing-lg) 0;">
+
+    <!-- Features Section -->
+    <section class="features" id="features">
         <div class="container">
-            <div class="hero-content">
-                <p class="hero-subtitle">Choose the perfect plan for your CRE business</p>
+            <h2 class="text-center">The Calculator's Free. The Tracker Makes You Unstoppable.</h2>
+            <p class="text-center section-subtitle">For Less Than A Coffee At Starbucks® A Week, Track Your Outreach Daily And Hit Your Income Goals With Ease</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--secondary-blue)" stroke-width="2">
+                            <rect x="3" y="5" width="6" height="6" rx="1"></rect>
+                            <path d="m5 12 2 2 4-4"></path>
+                            <path d="M13 6h8"></path>
+                            <path d="M13 12h8"></path>
+                            <path d="M13 18h8"></path>
+                        </svg>
+                    </div>
+                    <h3>PRO: Daily Accountability</h3>
+                    <p>Log the contact attempts you made today, see your gap, finish the day hitting your goals.</p>
+                    <div class="feature-highlight feature-pro">Pro Feature: Daily Activity Logging and Tracking</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent-yellow)" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                            <path d="M8 14h.01"></path>
+                            <path d="M12 14h.01"></path>
+                            <path d="M16 14h.01"></path>
+                            <path d="M8 18h.01"></path>
+                            <path d="M12 18h.01"></path>
+                        </svg>
+                    </div>
+                    <h3>PRO: Earn Your Weekend</h3>
+                    <p>Know exactly how many calls you still need by Friday. Hit your number. Enjoy guilt-free time with family.</p>
+                    <div class="feature-highlight feature-pro">Pro Feature: Weekly Progress Tracking</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary-navy)" stroke-width="2">
+                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                            <path d="M4 22h16"></path>
+                            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                        </svg>
+                    </div>
+                    <h3>PRO: Winner's Advantage</h3>
+                    <p>Discover your peak performance patterns. Close more deals by knowing when you're unstoppable.</p>
+                    <div class="feature-highlight feature-pro">Pro Feature: Weekly Performance insights</div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section class="pricing-section">
+    <!-- Pricing Preview Section -->
+    <section class="pricing-preview" id="pricing">
         <div class="container">
-            <div id="messageContainer"></div>
-            
-            <div class="pricing-grid" id="pricingGrid">
-                <!-- Loading state -->
-                <div class="pricing-card loading-card">
-                    <div class="loading-content">
-                        <div class="loading-spinner"></div>
-                        <p>Loading plans...</p>
-                    </div>
+            <h2 class="text-center">Start with Free Calculator. Upgrade When Ready.</h2>
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <h3>Monthly Pro</h3>
+                    <div class="price">$19<span>/month</span></div>
+                    <ul class="features-list">
+                        <li>✅ Free Calculator Access</li>
+                        <li>✅ Daily Activity Tracking</li>
+                        <li>✅ Progress Dashboard</li>
+                        <li>✅ Historical Data & Trends</li>
+                        <li>✅ Performance Analytics</li>
+                    </ul>
+                    <button onclick="startCheckout('monthly')" class="btn btn-outline">Start Tracking Now</button>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="popular-badge">Most Popular</div>
+                    <h3>Annual Pro</h3>
+                    <div class="price">$189<span>/year</span></div>
+                    <ul class="features-list">
+                        <li>✅ Everything in Monthly</li>
+                        <li>✅ 2 Months Free</li>
+                        <li>✅ Priority Support</li>
+                        <li>✅ Advanced Analytics</li>
+                        <li>✅ Export Data</li>
+                    </ul>
+                    <button onclick="startCheckout('yearly')" class="btn btn-accent">Start Tracking Now</button>
+                </div>
+                <div class="pricing-card">
+                    <h3>Lifetime Pro</h3>
+                    <div class="price">$297<span>/once</span></div>
+                    <ul class="features-list">
+                        <li>✅ Everything in Annual</li>
+                        <li>✅ Lifetime Access</li>
+                        <li>✅ All Future Updates</li>
+                        <li>✅ VIP Support</li>
+                        <li>✅ Beta Feature Access</li>
+                    </ul>
+                    <button onclick="startCheckout('lifetime')" class="btn btn-outline">Start Tracking Now</button>
                 </div>
             </div>
         </div>
@@ -90,16 +168,14 @@
             <div class="footer-content">
                 <div class="footer-brand">
                     <img src="/images/logo.png" alt="AcquisitionPRO® Logo" class="footer-logo">
-                    <p class="footer-description">
-                        The #1 commercial real estate goal calculator and activity tracker for brokers and investors.
-                    </p>
+                    <p>The #1 commercial real estate goal calculator and activity tracker for brokers and investors.</p>
                 </div>
                 <div class="footer-links">
                     <h4>Product</h4>
                     <ul>
-                        <li><a href="/calculator">Free Calculator</a></li>
-                        <li><a href="/pricing">Pricing</a></li>
-                        <li><a href="/features">Features</a></li>
+                        <li><a href="/register">Free Calculator</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#features">Features</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
@@ -116,457 +192,103 @@
         </div>
     </footer>
 
-    <style>
-        /* Pricing section styling */
-        .pricing-section {
-            padding: var(--spacing-lg) 0;
-            background: var(--gray-50);
-        }
-
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: var(--spacing-lg);
-            margin-top: var(--spacing-lg);
-            align-items: stretch;
-        }
-
-        .pricing-card {
-            background: var(--white);
-            border-radius: var(--border-radius-lg);
-            padding: var(--spacing-lg);
-            box-shadow: var(--shadow-md);
-            text-align: center;
-            position: relative;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .pricing-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .pricing-card.featured {
-            border-color: var(--accent-yellow);
-            transform: scale(1.02);
-        }
-
-        .pricing-card.featured::before {
-            content: 'MOST POPULAR';
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent-yellow);
-            color: var(--primary-navy);
-            padding: 6px 20px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .plan-header {
-            margin-bottom: var(--spacing-md);
-        }
-
-        .plan-name {
-            font-size: var(--font-size-xl);
-            font-weight: 700;
-            color: var(--primary-navy);
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .plan-price {
-            font-size: var(--font-size-3xl);
-            font-weight: 800;
-            color: var(--secondary-blue);
-            margin-bottom: var(--spacing-xs);
-            line-height: 1;
-        }
-
-        .plan-price .currency {
-            font-size: var(--font-size-lg);
-            vertical-align: top;
-        }
-
-        .plan-period {
-            color: var(--text-muted);
-            font-size: var(--font-size-sm);
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .plan-savings {
-            background: var(--success-bg);
-            color: var(--success-color);
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .plan-features {
-            list-style: none;
-            padding: 0;
-            margin: var(--spacing-md) 0;
-            text-align: left;
-            flex-grow: 1;
-        }
-
-        .plan-features li {
-            padding: var(--spacing-xs) 0;
-            position: relative;
-            padding-left: var(--spacing-md);
-            color: var(--text-secondary);
-            font-size: var(--font-size-sm);
-        }
-
-        .plan-features li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: var(--success-color);
-            font-weight: 700;
-            font-size: 1rem;
-        }
-
-        .plan-button {
-            width: 100%;
-            margin-top: auto;
-        }
-
-        .loading-card {
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .loading-content {
-            text-align: center;
-        }
-
-        .loading-spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid var(--gray-200);
-            border-top: 3px solid var(--primary-navy);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto var(--spacing-md);
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .message {
-            padding: var(--spacing-md);
-            border-radius: var(--border-radius-md);
-            text-align: center;
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .message.error {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .message.success {
-            background-color: rgba(34, 197, 94, 0.1);
-            color: #16a34a;
-            border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .pricing-grid {
-                grid-template-columns: 1fr;
-                gap: var(--spacing-md);
+    <!-- Vimeo Player API -->
+    <script src="https://player.vimeo.com/api/player.js"></script>
+    
+    <!-- Video Player JavaScript -->
+    <script>
+        // Video player functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoPlaceholder = document.getElementById('heroVideo');
+            const placeholderContent = document.getElementById('videoPlaceholderContent');
+            const vimeoEmbed = document.getElementById('vimeoEmbed');
+            const vimeoIframe = document.getElementById('vimeoIframe');
+            
+            console.log('Video elements found:', {
+                placeholder: !!videoPlaceholder,
+                content: !!placeholderContent,
+                embed: !!vimeoEmbed,
+                iframe: !!vimeoIframe
+            });
+            
+            // Add iframe event listeners
+            if (vimeoIframe) {
+                vimeoIframe.addEventListener('load', function() {
+                    console.log('✅ Vimeo iframe loaded successfully');
+                });
+                
+                vimeoIframe.addEventListener('error', function() {
+                    console.error('❌ Vimeo iframe failed to load');
+                });
             }
             
-            .pricing-card.featured {
-                transform: none;
-                margin-top: var(--spacing-md);
+            // Handle video placeholder click
+            if (videoPlaceholder) {
+                videoPlaceholder.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('🎬 Video placeholder clicked');
+                    
+                    try {
+                        // Hide placeholder and show Vimeo embed
+                        if (placeholderContent && vimeoEmbed) {
+                            placeholderContent.style.display = 'none';
+                            vimeoEmbed.style.display = 'block';
+                            
+                            console.log('✅ Video embed shown successfully');
+                        }
+                        
+                        // Track video play event
+                        if (typeof gtag !== 'undefined') {
+                            gtag('event', 'play', {
+                                event_category: 'Video',
+                                event_label: 'Hero Demo Video'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('❌ Error showing video:', error);
+                    }
+                });
             }
-        }
-    </style>
-
-    <script>
-        // Initialize Stripe
-        const stripe = Stripe('pk_test_51RxvU9DsqcDDXpnRTc3rzlXCRsEniujL2h0Rlk3vXbaTmb3X5moITi5jaz1x9iVZWphG6juGyqZJ2FgbhODlsYQf00Qw7l0rWM');
-
-        // State
-        let pricingPlans = {};
-        let isAuthenticated = false;
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== PRICING PAGE LOADED ===');
-            checkAuthStatus()
-                .then(() => loadPricingPlans())
-                .then(() => handleUrlParams())
-                .catch(console.error);
         });
 
-        // Check authentication
-        async function checkAuthStatus() {
-            console.log('=== PRICING PAGE AUTH CHECK START ===');
+        // Stripe Checkout Function
+        async function startCheckout(planType) {
             try {
-                const token = localStorage.getItem('access_token');
-                console.log('Pricing page - checking auth, access_token exists:', !!token);
-                console.log('Pricing page - access_token value:', token ? token.substring(0, 20) + '...' : 'null');
+                console.log('Starting checkout for plan:', planType);
                 
-                if (token) {
-                    const response = await fetch('/api/auth/profile', {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    console.log('Pricing page - auth response status:', response.status);
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('Pricing page - user data received:', data.user);
-                        isAuthenticated = true;
-                        updateHeaderForLoggedInUser(data.user);
-                    } else {
-                        console.log('Pricing page - auth response not ok');
-                        isAuthenticated = false;
-                    }
-                } else {
-                    console.log('Pricing page - no access_token found');
-                    isAuthenticated = false;
-                }
-            } catch (error) {
-                console.error('Pricing page - auth check failed:', error);
-                isAuthenticated = false;
-            }
-            console.log('=== PRICING PAGE AUTH CHECK END - isAuthenticated:', isAuthenticated, '===');
-        }
-
-        // Update header for logged-in users
-        function updateHeaderForLoggedInUser(user) {
-            const navCta = document.getElementById('navCta');
-            const firstName = user.profile?.first_name || 'User';
-            navCta.innerHTML = `
-                <span style="color: var(--text-secondary); margin-right: var(--spacing-md); font-size: var(--font-size-sm);">
-                    Hello, ${firstName}!
-                </span>
-                <a href="/app" class="btn btn-outline btn-small">Dashboard</a>
-                <button class="btn btn-secondary btn-small" id="logoutBtn">Logout</button>
-            `;
-            
-            // Add event listener for logout button
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', handleLogout);
-            }
-        }
-
-        // Logout handler
-        async function handleLogout() {
-            try {
-                const token = localStorage.getItem('token');
-                await fetch('/api/auth/logout', {
+                // Show loading state
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Processing...';
+                button.disabled = true;
+                
+                const response = await fetch('/api/subscription/guest-checkout', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ planType })
                 });
-            } catch (error) {
-                console.error('Logout error:', error);
-            }
-            localStorage.clear();
-            window.location.href = '/';
-        }
-
-        // Load pricing plans
-        async function loadPricingPlans() {
-            try {
-                const response = await fetch('/api/subscriptions/plans');
+                
                 const data = await response.json();
                 
-                if (data.success) {
-                    pricingPlans = data.plans;
-                    renderPricingCards();
+                if (data.success && data.checkoutUrl) {
+                    // Redirect to Stripe Checkout
+                    window.location.href = data.checkoutUrl;
                 } else {
-                    showMessage('error', 'Failed to load pricing plans. Please refresh the page.');
+                    throw new Error(data.error || 'Checkout failed');
                 }
+                
             } catch (error) {
-                console.error('Error loading pricing plans:', error);
-                showMessage('error', 'Failed to load pricing plans. Please refresh the page.');
-            }
-        }
-
-        // Render pricing cards
-        function renderPricingCards() {
-            const pricingGrid = document.getElementById('pricingGrid');
-            pricingGrid.innerHTML = '';
-
-            const planOrder = ['monthly', 'yearly', 'lifetime'];
-            
-            planOrder.forEach((planKey) => {
-                const plan = pricingPlans[planKey];
-                if (!plan) return;
-
-                const isFeatured = planKey === 'yearly';
-                let savings = '';
+                console.error('Checkout error:', error);
+                alert('Unable to start checkout. Please try again.');
                 
-                if (planKey === 'yearly') {
-                    savings = 'Save $39';
-                } else if (planKey === 'lifetime') {
-                    savings = 'Best Value';
-                }
-
-                const card = document.createElement('div');
-                card.className = `pricing-card ${isFeatured ? 'featured' : ''}`;
-                
-                card.innerHTML = `
-                    <div class="plan-header">
-                        <div class="plan-name">${plan.name}</div>
-                        <div class="plan-price">
-                            <span class="currency">$</span>${plan.price}
-                        </div>
-                        <div class="plan-period">
-                            ${plan.interval ? `per ${plan.interval}` : 'one-time payment'}
-                        </div>
-                        ${savings ? `<div class="plan-savings">${savings}</div>` : ''}
-                    </div>
-                    <ul class="plan-features">
-                        ${plan.features.map(feature => `<li>${feature}</li>`).join('')}
-                    </ul>
-                    <button class="btn btn-primary btn-large plan-button" data-plan="${planKey}">
-                        ${isAuthenticated ? 'Get Started' : 'Sign Up & Subscribe'}
-                    </button>
-                `;
-
-                pricingGrid.appendChild(card);
-            });
-
-            // Add event listeners to buttons (CSP compliant)
-            document.querySelectorAll('.plan-button').forEach(button => {
-                button.addEventListener('click', function(event) {
-                    const planType = this.getAttribute('data-plan');
-                    selectPlan(planType, event);
-                });
-            });
-        }
-
-        // Create guest checkout session
-        function createGuestCheckoutSession(planType, event) {
-            const button = event.target;
-            const originalText = button.textContent;
-            
-            button.disabled = true;
-            button.textContent = 'Processing...';
-
-            fetch('/api/subscriptions/guest-checkout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ planType })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.checkoutUrl) {
-                    window.location.href = data.checkoutUrl;
-                } else {
-                    showMessage('error', data.error || 'Failed to create checkout session');
-                    button.disabled = false;
+                // Reset button
+                if (button) {
                     button.textContent = originalText;
-                }
-            })
-            .catch(error => {
-                console.error('Error creating guest checkout session:', error);
-                showMessage('error', 'An error occurred. Please try again.');
-                button.disabled = false;
-                button.textContent = originalText;
-            });
-        }
-
-        // Handle plan selection
-        async function selectPlan(planType, event) {
-            console.log('=== PLAN SELECTION START ===');
-            console.log('Plan selected:', planType);
-            console.log('Current isAuthenticated value:', isAuthenticated);
-            
-            // Double-check authentication status before proceeding
-            console.log('Double-checking authentication...');
-            await checkAuthStatus();
-            
-            console.log('Final auth status for checkout:', isAuthenticated);
-            
-            if (!isAuthenticated) {
-                console.log('Using guest checkout flow');
-                // For guests, create anonymous checkout session
-                createGuestCheckoutSession(planType, event);
-                return;
-            }
-            
-            console.log('Using authenticated checkout flow');
-
-            const button = event.target;
-            const originalText = button.textContent;
-            
-            button.disabled = true;
-            button.textContent = 'Processing...';
-
-            const token = localStorage.getItem('access_token');
-            console.log('Access token for authenticated checkout:', token ? 'exists' : 'missing');
-            
-            fetch('/api/subscriptions/checkout', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ planType })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.checkoutUrl) {
-                    window.location.href = data.checkoutUrl;
-                } else {
-                    showMessage('error', data.error || 'Failed to create checkout session');
                     button.disabled = false;
-                    button.textContent = originalText;
                 }
-            })
-            .catch(error => {
-                console.error('Error creating checkout session:', error);
-                showMessage('error', 'An error occurred. Please try again.');
-                button.disabled = false;
-                button.textContent = originalText;
-            });
-        }
-
-        // Handle URL parameters
-        function handleUrlParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            if (urlParams.get('canceled')) {
-                showMessage('error', 'Payment was canceled. You can try again anytime.');
             }
-        }
-
-        // Show message
-        function showMessage(type, message) {
-            const container = document.getElementById('messageContainer');
-            container.innerHTML = `<div class="message ${type}">${message}</div>`;
-
-            setTimeout(() => {
-                container.innerHTML = '';
-            }, 5000);
         }
     </script>
 </body>
