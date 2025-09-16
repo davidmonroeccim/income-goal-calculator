@@ -744,8 +744,49 @@
         }
 
         async function handleResendVerification() {
-            // Implementation for resending verification email
-            showMessage('Verification email sent! Please check your inbox.', 'success', messageContainer);
+            try {
+                const button = document.getElementById('resendVerificationButton');
+                const originalText = button.textContent;
+                
+                button.disabled = true;
+                button.textContent = 'Sending...';
+                
+                const response = await window.authManager.makeAuthenticatedRequest('/api/user/resend-verification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    if (data.already_verified) {
+                        showMessage('✅ Your email is already verified!', 'success', messageContainer);
+                        // Update UI to show verified status
+                        updateEmailVerificationStatus(true);
+                    } else {
+                        showMessage('📧 Verification email sent! Please check your inbox and spam folder.', 'success', messageContainer);
+                    }
+                } else {
+                    if (response.status === 429) {
+                        showMessage('⏳ Please wait before requesting another verification email.', 'warning', messageContainer);
+                    } else {
+                        showMessage(data.error || 'Failed to send verification email. Please try again.', 'error', messageContainer);
+                    }
+                }
+                
+                button.disabled = false;
+                button.textContent = originalText;
+                
+            } catch (error) {
+                console.error('Resend verification error:', error);
+                showMessage('An error occurred. Please try again.', 'error', messageContainer);
+                
+                const button = document.getElementById('resendVerificationButton');
+                button.disabled = false;
+                button.textContent = 'Resend Verification';
+            }
         }
 
         async function handleExportData() {

@@ -139,6 +139,7 @@ app.use('/api/goals', require('./routes/goals'));
 app.use('/api/activities', require('./routes/activities'));
 app.use('/api/subscriptions', require('./routes/subscriptions'));
 app.use('/api/highlevel', require('./routes/highlevel'));
+app.use('/api/user', require('./routes/user'));
 
 // Basic API health check
 app.get('/api/health', (req, res) => {
