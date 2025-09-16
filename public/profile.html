@@ -421,7 +421,37 @@
             await loadSubscriptionStatus();
 
             // Check email verification status
-            updateEmailVerificationStatus(profile.email_verified);
+            await checkEmailVerificationStatus();
+        }
+
+        async function checkEmailVerificationStatus() {
+            const statusElement = document.getElementById('emailVerificationStatus');
+            const resendButton = document.getElementById('resendVerificationButton');
+            
+            try {
+                // Get current user from auth manager
+                const currentUser = window.authManager && window.authManager.getCurrentUser();
+                
+                if (currentUser && currentUser.email_confirmed_at) {
+                    // Email is verified
+                    statusElement.textContent = '✅ Your email address is verified';
+                    statusElement.className = 'status-verified';
+                    resendButton.style.display = 'none';
+                    console.log('✅ Email verification status: verified');
+                } else {
+                    // Email needs verification
+                    statusElement.textContent = '⚠️ Your email address needs verification';
+                    statusElement.className = 'status-unverified';
+                    resendButton.style.display = 'inline-block';
+                    console.log('⚠️ Email verification status: unverified');
+                }
+            } catch (error) {
+                console.error('Error checking email verification status:', error);
+                // Default to showing verification needed
+                statusElement.textContent = '⚠️ Unable to check verification status';
+                statusElement.className = 'status-unverified';
+                resendButton.style.display = 'inline-block';
+            }
         }
 
         function updateEmailVerificationStatus(isVerified) {
@@ -791,6 +821,12 @@
 
         async function handleExportData() {
             try {
+                const button = document.getElementById('exportDataButton');
+                const originalText = button.textContent;
+                
+                button.disabled = true;
+                button.textContent = 'Preparing Export...';
+                
                 const response = await window.authManager.makeAuthenticatedRequest('/api/user/export');
 
                 if (response.ok) {
@@ -798,19 +834,27 @@
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `income-goal-data-${new Date().getTime()}.json`;
+                    a.download = `Income-Goal-Data-${new Date().toISOString().split('T')[0]}.csv`;
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);
                     document.body.removeChild(a);
                     
-                    showMessage('Data exported successfully!', 'success', messageContainer);
+                    showMessage('📊 Data exported successfully! File can be opened in Excel or Google Sheets.', 'success', messageContainer);
                 } else {
                     showMessage('Failed to export data', 'error', messageContainer);
                 }
+                
+                button.disabled = false;
+                button.textContent = originalText;
+                
             } catch (error) {
                 console.error('Export error:', error);
                 showMessage('Failed to export data', 'error', messageContainer);
+                
+                const button = document.getElementById('exportDataButton');
+                button.disabled = false;
+                button.textContent = 'Export Data';
             }
         }
 

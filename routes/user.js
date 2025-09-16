@@ -42,28 +42,63 @@ router.get('/export', requireAuth, async (req, res) => {
             console.error('❌ Error fetching activities:', activitiesError);
         }
         
-        // Create export data
-        const exportData = {
-            exported_at: new Date().toISOString(),
-            user_id: userId,
-            profile: profile || {},
-            goals: goals || [],
-            activities: activities || [],
-            summary: {
-                total_goals: (goals || []).length,
-                total_activities: (activities || []).length,
-                account_created: profile?.created_at || null
-            }
-        };
+        // Create CSV content for user-friendly export
+        const csvRows = [];
         
-        console.log('✅ Export data prepared:', {
-            goals: exportData.goals.length,
-            activities: exportData.activities.length
+        // Add header with summary
+        csvRows.push('Income Goal Calculator - Data Export');
+        csvRows.push(`Export Date: ${new Date().toLocaleDateString()}`);
+        csvRows.push(`Account Created: ${profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'N/A'}`);
+        csvRows.push(`Total Goals: ${(goals || []).length}`);
+        csvRows.push(`Total Activities: ${(activities || []).length}`);
+        csvRows.push(''); // Empty line
+        
+        // Goals section
+        if (goals && goals.length > 0) {
+            csvRows.push('=== YOUR INCOME GOALS ===');
+            csvRows.push('Goal Name,Target Income,Created Date,Status');
+            
+            goals.forEach(goal => {
+                const goalName = (goal.goal_name || 'Untitled Goal').replace(/,/g, ';');
+                const targetIncome = goal.target_income || 0;
+                const createdDate = goal.created_at ? new Date(goal.created_at).toLocaleDateString() : 'N/A';
+                const status = goal.status || 'Active';
+                
+                csvRows.push(`"${goalName}","$${targetIncome.toLocaleString()}","${createdDate}","${status}"`);
+            });
+            csvRows.push(''); // Empty line
+        }
+        
+        // Activities section
+        if (activities && activities.length > 0) {
+            csvRows.push('=== YOUR ACTIVITY TRACKING ===');
+            csvRows.push('Date,Calls Made,Emails Sent,Meetings,Networking Events,Total Activities');
+            
+            activities.forEach(activity => {
+                const date = activity.activity_date ? new Date(activity.activity_date).toLocaleDateString() : 'N/A';
+                const calls = activity.calls_made || 0;
+                const emails = activity.emails_sent || 0;
+                const meetings = activity.meetings_attended || 0;
+                const networking = activity.networking_events || 0;
+                const total = calls + emails + meetings + networking;
+                
+                csvRows.push(`"${date}","${calls}","${emails}","${meetings}","${networking}","${total}"`);
+            });
+        } else {
+            csvRows.push('=== YOUR ACTIVITY TRACKING ===');
+            csvRows.push('No activities recorded yet. Start tracking your daily activities to see your progress!');
+        }
+        
+        const csvContent = csvRows.join('\n');
+        
+        console.log('✅ CSV export prepared:', {
+            goals: (goals || []).length,
+            activities: (activities || []).length
         });
         
-        res.setHeader('Content-Type', 'application/json');
-        res.setHeader('Content-Disposition', `attachment; filename="income-goal-data-${userId}-${Date.now()}.json"`);
-        res.json(exportData);
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="Income-Goal-Data-${new Date().toISOString().split('T')[0]}.csv"`);
+        res.send(csvContent);
         
     } catch (error) {
         console.error('❌ Export error:', error);
