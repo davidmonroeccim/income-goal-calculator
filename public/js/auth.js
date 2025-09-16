@@ -33,6 +33,9 @@ class AuthManager {
 
     // Session Management
     startSessionManagement() {
+        // First, check for authentication tokens passed via URL hash (for iframe new tab scenarios)
+        this.checkUrlAuthentication();
+        
         // Check session on page load
         this.validateSession();
 
@@ -65,6 +68,43 @@ class AuthManager {
                 this.handleLogout(false);
             }
         });
+    }
+
+    // Check for authentication tokens passed via URL hash (for iframe new tab scenarios)
+    checkUrlAuthentication() {
+        try {
+            const hash = window.location.hash;
+            if (hash && hash.includes('auth=')) {
+                const match = hash.match(/auth=([^&]+)/);
+                if (match) {
+                    const tokenData = JSON.parse(atob(match[1]));
+                    
+                    // Validate token data structure and timestamp (must be recent)
+                    if (tokenData.access_token && tokenData.refresh_token && tokenData.timestamp) {
+                        const tokenAge = Date.now() - tokenData.timestamp;
+                        
+                        // Only use tokens if they're less than 5 minutes old
+                        if (tokenAge < 5 * 60 * 1000) {
+                            console.log('🔗 Restoring authentication from URL hash');
+                            
+                            // Store tokens in localStorage
+                            localStorage.setItem('access_token', tokenData.access_token);
+                            localStorage.setItem('refresh_token', tokenData.refresh_token);
+                            
+                            // Clean up URL hash
+                            const cleanHash = hash.replace(/auth=[^&]*&?/, '').replace(/^#&/, '#').replace(/^#$/, '');
+                            window.history.replaceState(null, null, cleanHash ? `#${cleanHash}` : window.location.pathname);
+                            
+                            console.log('✅ Authentication restored successfully from URL hash');
+                        } else {
+                            console.warn('⚠️ URL authentication tokens too old, ignoring');
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error parsing URL authentication:', error);
+        }
     }
 
     async validateSession() {

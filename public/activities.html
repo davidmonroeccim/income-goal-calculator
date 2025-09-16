@@ -891,7 +891,27 @@
             
             // Check if in iframe mode and open pricing in new tab
             if (window.iframeDetector && window.iframeDetector.isInIframe()) {
-                window.open('/pricing', '_blank', 'noopener,noreferrer');
+                // For iframe mode, include auth tokens in URL to preserve authentication
+                let pricingUrl = '/pricing';
+                
+                // Add authentication context to URL for new tab
+                if (window.authManager && window.authManager.isAuthenticated()) {
+                    const accessToken = window.authManager.getAccessToken();
+                    const refreshToken = window.authManager.getRefreshToken();
+                    
+                    if (accessToken && refreshToken) {
+                        // Use URL fragment (hash) to pass tokens securely - not sent to server
+                        const tokenData = btoa(JSON.stringify({
+                            access_token: accessToken,
+                            refresh_token: refreshToken,
+                            timestamp: Date.now()
+                        }));
+                        pricingUrl = `/pricing#auth=${tokenData}`;
+                        console.log('Including authentication context for new tab');
+                    }
+                }
+                
+                window.open(pricingUrl, '_blank', 'noopener,noreferrer');
             } else {
                 // For standalone mode, redirect normally
                 window.location.href = '/pricing';
