@@ -512,7 +512,7 @@
                         // Show billing management options
                         subscriptionActions.innerHTML = `
                             <div style="margin-top: 10px;">
-                                <button class="btn btn-sm btn-secondary" onclick="openBillingPortal()" style="margin-right: 10px;">
+                                <button class="btn btn-sm btn-secondary" onclick="openBillingPortal(event)" style="margin-right: 10px;">
                                     📄 Manage Billing
                                 </button>
                                 <button class="btn btn-sm btn-outline" onclick="cancelSubscription()" style="color: #dc3545; border-color: #dc3545;">
@@ -557,11 +557,16 @@
         }
 
         async function openBillingPortal(event) {
+            let button = null;
+            let originalText = '📄 Manage Billing';
+            
             try {
-                const button = event.target;
-                const originalText = button.textContent;
-                button.disabled = true;
-                button.textContent = 'Opening...';
+                if (event && event.target) {
+                    button = event.target;
+                    originalText = button.textContent;
+                    button.disabled = true;
+                    button.textContent = 'Opening...';
+                }
 
                 const response = await window.authManager.makeAuthenticatedRequest('/api/subscriptions/billing-portal', {
                     method: 'POST',
@@ -589,8 +594,10 @@
                 console.error('Error opening billing portal:', error);
                 alert('An error occurred. Please try again.');
             } finally {
-                button.disabled = false;
-                button.textContent = '📄 Manage Billing';
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
             }
         }
 
