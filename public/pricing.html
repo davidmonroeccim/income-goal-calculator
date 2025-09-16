@@ -310,13 +310,31 @@
                 button.textContent = 'Processing...';
                 button.disabled = true;
                 
-                const response = await fetch('/api/subscriptions/guest-checkout', {
+                // Check authentication status to determine checkout endpoint
+                const isAuthenticated = window.authManager && window.authManager.isAuthenticated();
+                const checkoutEndpoint = isAuthenticated ? '/api/subscriptions/checkout' : '/api/subscriptions/guest-checkout';
+                
+                console.log('User authenticated:', isAuthenticated);
+                console.log('Using checkout endpoint:', checkoutEndpoint);
+                
+                // Prepare request options
+                const requestOptions = {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ planType })
-                });
+                };
+                
+                // Add authorization header for authenticated users
+                if (isAuthenticated) {
+                    const accessToken = window.authManager.getAccessToken();
+                    if (accessToken) {
+                        requestOptions.headers['Authorization'] = `Bearer ${accessToken}`;
+                    }
+                }
+                
+                const response = await fetch(checkoutEndpoint, requestOptions);
                 
                 const data = await response.json();
                 
