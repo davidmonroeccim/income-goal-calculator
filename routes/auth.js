@@ -278,7 +278,7 @@ router.post('/logout', async (req, res) => {
 });
 
 // Password reset request
-router.post('/forgot-password', strictAuthLimiter, async (req, res) => {
+router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -329,7 +329,7 @@ router.post('/forgot-password', strictAuthLimiter, async (req, res) => {
 });
 
 // Password reset (update password with reset token)
-router.post('/reset-password', strictAuthLimiter, async (req, res) => {
+router.post('/reset-password', async (req, res) => {
   try {
     const { access_token, refresh_token, new_password } = req.body;
 
@@ -673,7 +673,7 @@ router.post('/update-activity-role', async (req, res) => {
 });
 
 // Register after payment endpoint
-router.post('/register-after-payment', strictAuthLimiter, async (req, res) => {
+router.post('/register-after-payment', async (req, res) => {
   try {
     const { email, password, firstName, lastName, userType, sessionId, planType } = req.body;
 
