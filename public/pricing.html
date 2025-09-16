@@ -203,8 +203,50 @@
     
     <!-- Video Player JavaScript -->
     <script>
+        // Update navigation based on authentication status
+        function updateNavigationForAuth() {
+            console.log('🔍 Checking authentication status for navigation update');
+            
+            const navCta = document.getElementById('navCta');
+            if (!navCta) return;
+            
+            // Wait for auth manager to be available and initialized
+            const checkAuth = () => {
+                if (window.authManager && window.authManager.isAuthenticated()) {
+                    console.log('✅ User authenticated, updating navigation to show authenticated state');
+                    
+                    // Replace login/register buttons with authenticated navigation
+                    navCta.innerHTML = `
+                        <a href="/app" class="btn btn-outline btn-small">Dashboard</a>
+                        <a href="/profile" class="btn btn-primary btn-small">Profile</a>
+                    `;
+                } else {
+                    console.log('ℹ️ User not authenticated, showing login/register buttons');
+                    
+                    // Keep default login/register buttons
+                    navCta.innerHTML = `
+                        <a href="/login" class="btn btn-outline btn-small">Login</a>
+                        <a href="/register" class="btn btn-primary btn-small">Get Started</a>
+                    `;
+                }
+            };
+            
+            // Check immediately if auth manager is available
+            if (window.authManager) {
+                checkAuth();
+            } else {
+                // Wait for auth manager to initialize
+                setTimeout(() => {
+                    checkAuth();
+                }, 500);
+            }
+        }
+        
         // Video player functionality
         document.addEventListener('DOMContentLoaded', function() {
+            // Update navigation based on authentication status
+            updateNavigationForAuth();
+            
             const videoPlaceholder = document.getElementById('heroVideo');
             const placeholderContent = document.getElementById('videoPlaceholderContent');
             const vimeoEmbed = document.getElementById('vimeoEmbed');
