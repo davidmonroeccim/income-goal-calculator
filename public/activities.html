@@ -387,7 +387,10 @@
                 closeUpgradeModalBtn.addEventListener('click', closeUpgradeModal);
             }
             if (upgradeNowBtn) {
+                console.log('✅ Upgrade Now button found, attaching click listener');
                 upgradeNowBtn.addEventListener('click', initiateUpgrade);
+            } else {
+                console.error('❌ Upgrade Now button not found in DOM');
             }
             if (maybeLaterBtn) {
                 maybeLaterBtn.addEventListener('click', closeUpgradeModal);
@@ -884,6 +887,7 @@
         }
 
         async function initiateUpgrade() {
+            console.log('🔥 UPGRADE BUTTON CLICKED! initiateUpgrade function called');
             console.log('=== INITIATING UPGRADE FROM ACTIVITIES PAGE ===');
             console.log('Iframe detector available:', !!window.iframeDetector);
             console.log('Is in iframe:', window.iframeDetector ? window.iframeDetector.isInIframe() : 'N/A');
