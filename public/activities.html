@@ -885,12 +885,18 @@
 
         async function initiateUpgrade() {
             console.log('=== INITIATING UPGRADE FROM ACTIVITIES PAGE ===');
+            console.log('Iframe detector available:', !!window.iframeDetector);
+            console.log('Is in iframe:', window.iframeDetector ? window.iframeDetector.isInIframe() : 'N/A');
+            console.log('Auth manager available:', !!window.authManager);
+            console.log('Is authenticated:', window.authManager ? window.authManager.isAuthenticated() : 'N/A');
             
             // Always redirect to pricing page instead of direct checkout
             console.log('Redirecting to pricing page for plan selection');
             
             // Check if in iframe mode and open pricing in new tab
             if (window.iframeDetector && window.iframeDetector.isInIframe()) {
+                console.log('📱 IFRAME MODE: Opening pricing in new tab with authentication');
+                
                 // For iframe mode, include auth tokens in URL to preserve authentication
                 let pricingUrl = '/pricing';
                 
@@ -907,12 +913,18 @@
                             timestamp: Date.now()
                         }));
                         pricingUrl = `/pricing#auth=${tokenData}`;
-                        console.log('Including authentication context for new tab');
+                        console.log('🔐 Including authentication context for new tab');
+                        console.log('🔗 Opening URL:', pricingUrl.substring(0, 50) + '...');
+                    } else {
+                        console.warn('⚠️ No valid tokens found for iframe new tab');
                     }
+                } else {
+                    console.warn('⚠️ Not authenticated for iframe new tab');
                 }
                 
                 window.open(pricingUrl, '_blank', 'noopener,noreferrer');
             } else {
+                console.log('🖥️ STANDALONE MODE: Redirecting normally');
                 // For standalone mode, redirect normally
                 window.location.href = '/pricing';
             }

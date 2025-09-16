@@ -74,14 +74,19 @@ class AuthManager {
     checkUrlAuthentication() {
         try {
             const hash = window.location.hash;
+            console.log('🔍 Checking URL hash for authentication:', hash ? 'Hash present' : 'No hash');
+            
             if (hash && hash.includes('auth=')) {
+                console.log('🔐 Found auth token in URL hash, attempting to restore...');
                 const match = hash.match(/auth=([^&]+)/);
                 if (match) {
+                    console.log('🔍 Parsing token data...');
                     const tokenData = JSON.parse(atob(match[1]));
                     
                     // Validate token data structure and timestamp (must be recent)
                     if (tokenData.access_token && tokenData.refresh_token && tokenData.timestamp) {
                         const tokenAge = Date.now() - tokenData.timestamp;
+                        console.log(`⏱️ Token age: ${Math.floor(tokenAge / 1000)} seconds`);
                         
                         // Only use tokens if they're less than 5 minutes old
                         if (tokenAge < 5 * 60 * 1000) {
@@ -99,11 +104,17 @@ class AuthManager {
                         } else {
                             console.warn('⚠️ URL authentication tokens too old, ignoring');
                         }
+                    } else {
+                        console.warn('⚠️ Invalid token data structure in URL hash');
                     }
+                } else {
+                    console.warn('⚠️ Could not extract auth token from URL hash');
                 }
+            } else {
+                console.log('ℹ️ No authentication data in URL hash');
             }
         } catch (error) {
-            console.error('Error parsing URL authentication:', error);
+            console.error('❌ Error parsing URL authentication:', error);
         }
     }
 
