@@ -886,23 +886,15 @@
         async function initiateUpgrade() {
             console.log('=== INITIATING UPGRADE FROM ACTIVITIES PAGE ===');
             
-            // Check authentication status first
-            const isAuth = window.authManager && window.authManager.isAuthenticated();
-            console.log('User authenticated:', isAuth);
+            // Always redirect to pricing page instead of direct checkout
+            console.log('Redirecting to pricing page for plan selection');
             
-            if (isAuth) {
-                // For authenticated users, directly start checkout for lifetime plan
-                console.log('Starting direct authenticated checkout for lifetime plan');
-                await startAuthenticatedCheckout('lifetime');
+            // Check if in iframe mode and open pricing in new tab
+            if (window.iframeDetector && window.iframeDetector.isInIframe()) {
+                window.open('/pricing', '_blank', 'noopener,noreferrer');
             } else {
-                console.log('User not authenticated, redirecting to pricing page');
-                // Check if in iframe mode and open pricing in new tab
-                if (window.iframeDetector && window.iframeDetector.isInIframe()) {
-                    window.open('/pricing', '_blank', 'noopener,noreferrer');
-                } else {
-                    // For standalone mode, redirect normally
-                    window.location.href = '/pricing';
-                }
+                // For standalone mode, redirect normally
+                window.location.href = '/pricing';
             }
         }
         
