@@ -398,6 +398,22 @@
             if (clearFormBtn) {
                 clearFormBtn.addEventListener('click', clearForm);
             }
+            
+            // Global click tracker for debugging
+            document.addEventListener('click', function(e) {
+                const target = e.target;
+                if (target.textContent.toLowerCase().includes('upgrade') || 
+                    target.textContent.toLowerCase().includes('pricing') ||
+                    target.className.includes('btn')) {
+                    console.log('🖱️ CLICK DETECTED:', {
+                        element: target.tagName,
+                        id: target.id,
+                        className: target.className,
+                        textContent: target.textContent.trim(),
+                        href: target.href || 'no href'
+                    });
+                }
+            });
         }
 
         // Set today's date as default
@@ -879,6 +895,7 @@
 
         // Modal functions
         function showUpgradeModal() {
+            console.log('🎯 SHOWING UPGRADE MODAL');
             document.getElementById('upgradeModal').style.display = 'flex';
         }
 
