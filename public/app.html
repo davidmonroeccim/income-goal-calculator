@@ -237,14 +237,33 @@
             if (!currentUser || !window.authManager) return;
 
             try {
-                const response = await window.authManager.makeAuthenticatedRequest('/api/goals/load');
+                // Try to load broker goals first, then investor goals if broker not found
+                let response = await window.authManager.makeAuthenticatedRequest('/api/goals/load?type=broker');
 
                 if (response.ok) {
                     const result = await response.json();
+                    console.log('Broker goals result:', result);
+
                     if (result.goals && result.goals.goal_data) {
-                        displayGoalsSummary(result.goals.goal_data);
+                        displayGoalsSummary(result.goals.goal_data, 'broker');
+                        return;
                     }
                 }
+
+                // If no broker goals, try investor goals
+                response = await window.authManager.makeAuthenticatedRequest('/api/goals/load?type=investor');
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Investor goals result:', result);
+
+                    if (result.goals && result.goals.goal_data) {
+                        displayGoalsSummary(result.goals.goal_data, 'investor');
+                        return;
+                    }
+                }
+
+                console.log('No goals found for user');
 
             } catch (error) {
                 console.error('Load goals error:', error);
@@ -252,20 +271,39 @@
         }
 
         // Display goals summary
-        function displayGoalsSummary(goalData) {
+        function displayGoalsSummary(goalData, userType = 'broker') {
             const goalsStatus = document.getElementById('goalsStatus');
             const goalsSummary = document.getElementById('goalsSummary');
 
-            if (goalData && goalData.netCommission) {
+            // Check for broker goals
+            if (userType === 'broker' && goalData && goalData.netCommission) {
                 // Hide status message and show goals
                 goalsStatus.style.display = 'none';
                 goalsSummary.style.display = 'block';
 
-                // Update values
+                // Update values for broker
                 document.getElementById('netCommissionGoal').textContent = '$' + goalData.netCommission.toLocaleString('en-US');
                 document.getElementById('grossCommissionGoal').textContent = '$' + goalData.grossCommission.toLocaleString('en-US');
                 document.getElementById('dailyAttemptsGoal').textContent = goalData.dailyAttempts;
                 document.getElementById('closingsNeededGoal').textContent = goalData.closingsNeeded;
+
+                console.log('Broker goals displayed');
+            }
+            // Check for investor goals
+            else if (userType === 'investor' && goalData && goalData.netAcquisitionFee) {
+                // Hide status message and show goals
+                goalsStatus.style.display = 'none';
+                goalsSummary.style.display = 'block';
+
+                // Update values for investor (using investor terminology)
+                document.getElementById('netCommissionGoal').textContent = '$' + goalData.netAcquisitionFee.toLocaleString('en-US');
+                document.getElementById('grossCommissionGoal').textContent = '$' + goalData.grossAcquisitionFee.toLocaleString('en-US');
+                document.getElementById('dailyAttemptsGoal').textContent = goalData.dailyAttempts;
+                document.getElementById('closingsNeededGoal').textContent = goalData.closingsNeeded;
+
+                console.log('Investor goals displayed');
+            } else {
+                console.log('No valid goal data to display');
             }
         }
 

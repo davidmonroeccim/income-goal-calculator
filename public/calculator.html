@@ -698,15 +698,18 @@
             if (!currentUser || !window.authManager) return;
 
             try {
-                const response = await window.authManager.makeAuthenticatedRequest('/api/goals/load');
+                // Load goals for current calculator type
+                const response = await window.authManager.makeAuthenticatedRequest(`/api/goals/load?type=${currentCalculatorType}`);
 
                 if (response.ok) {
                     const result = await response.json();
+                    console.log('Loaded goals:', result);
+
                     if (result.goals && result.goals.goal_data) {
                         const savedGoals = result.goals.goal_data;
-                        
-                        // Restore form values
-                        if (savedGoals.netCommission) {
+
+                        // Restore form values based on calculator type
+                        if (currentCalculatorType === 'broker' && savedGoals.netCommission) {
                             document.getElementById('netCommission').value = savedGoals.netCommission;
                             document.getElementById('commissionSplit').value = savedGoals.commissionSplit;
                             document.getElementById('avgSalePrice').value = savedGoals.avgSalePrice;
@@ -719,7 +722,27 @@
                             document.getElementById('sickDays').value = savedGoals.sickDays;
                             document.getElementById('conferenceDays').value = savedGoals.conferenceDays;
                             document.getElementById('trainingDays').value = savedGoals.trainingDays;
+
+                            console.log('Broker goals restored to form');
+                        } else if (currentCalculatorType === 'investor' && savedGoals.netAcquisitionFee) {
+                            document.getElementById('netAcquisitionFee').value = savedGoals.netAcquisitionFee;
+                            document.getElementById('reinvestmentPercentage').value = savedGoals.reinvestmentPercentage;
+                            document.getElementById('invAvgSalePrice').value = savedGoals.avgSalePrice;
+                            document.getElementById('avgAcquisitionFee').value = savedGoals.avgAcquisitionFee;
+                            document.getElementById('invClosingRatio').value = savedGoals.closingRatio;
+                            document.getElementById('opportunityRatio').value = savedGoals.opportunityRatio;
+                            document.getElementById('invAppointmentRatio').value = savedGoals.appointmentRatio;
+                            document.getElementById('invContactRatio').value = savedGoals.contactRatio;
+                            document.getElementById('invAttemptRatio').value = savedGoals.attemptRatio;
+                            document.getElementById('invVacationDays').value = savedGoals.vacationDays;
+                            document.getElementById('invSickDays').value = savedGoals.sickDays;
+                            document.getElementById('invConferenceDays').value = savedGoals.conferenceDays;
+                            document.getElementById('invTrainingDays').value = savedGoals.trainingDays;
+
+                            console.log('Investor goals restored to form');
                         }
+                    } else {
+                        console.log('No saved goals found for', currentCalculatorType);
                     }
                 }
 
@@ -729,7 +752,7 @@
         }
 
         // Calculator type switching
-        function switchCalculator(type) {
+        async function switchCalculator(type) {
             const brokerCalc = document.getElementById('brokerCalculator');
             const investorCalc = document.getElementById('investorCalculator');
             const toggleButtons = document.querySelectorAll('.toggle-btn');
@@ -744,16 +767,28 @@
                 brokerCalc.style.display = 'block';
                 investorCalc.style.display = 'none';
                 document.getElementById('brokerToggle').classList.add('active');
+
+                // Load saved broker goals if authenticated
+                if (currentUser) {
+                    await loadSavedGoals();
+                }
+
                 // Calculate numbers on switch
                 setTimeout(() => calculateNumbers(), 100);
             } else {
                 brokerCalc.style.display = 'none';
                 investorCalc.style.display = 'block';
                 document.getElementById('investorToggle').classList.add('active');
+
+                // Load saved investor goals if authenticated
+                if (currentUser) {
+                    await loadSavedGoals();
+                }
+
                 // Calculate investor numbers on switch
                 setTimeout(() => calculateInvestorNumbers(), 100);
             }
-            
+
             console.log('Switched to', type, 'calculator');
         }
     </script>

@@ -125,15 +125,18 @@ async function getUserGoals(userId, userType = null) {
     let query = supabaseAdmin
       .from('user_goals')
       .select('*')
-      .eq('user_id', userId);
-    
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false });
+
     // Add userType filter if provided
     if (userType && (userType === 'broker' || userType === 'investor')) {
       query = query.eq('user_type', userType);
     }
-    
-    const { data, error } = await query.single();
-    
+
+    // Use maybeSingle() instead of single() to handle zero results gracefully
+    // This returns null when no records found, instead of throwing an error
+    const { data, error } = await query.limit(1).maybeSingle();
+
     return { data, error };
   } catch (error) {
     console.error('Error getting user goals:', error);
