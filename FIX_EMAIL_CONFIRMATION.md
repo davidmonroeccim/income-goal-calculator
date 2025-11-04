@@ -45,16 +45,22 @@ When you deleted the user from Supabase before making a new payment, Supabase ma
 <p>If you didn't sign up for an account, you can safely ignore this email.</p>
 ```
 
-### Step 3: Check Email Auth Settings (2 minutes)
+### Step 3: Check Email Auth Settings (2 minutes) ⚠️ CRITICAL
 
 1. Go to **Authentication** → **URL Configuration**
 2. Verify **Site URL**: Should be `https://igc.acquisitionpro.io`
+   - ❌ **WRONG**: `https://igc.acquisitionpro.io/login` (Do NOT include /login!)
+   - ✅ **CORRECT**: `https://igc.acquisitionpro.io` (Base domain only!)
 3. Verify **Redirect URLs**: Should include:
    - `https://igc.acquisitionpro.io/login`
    - `https://igc.acquisitionpro.io/login?message=email_verified`
    - `http://localhost:3000/login` (for development)
 
-4. Click **"Save"** if you made changes
+   **Note**: If Redirect URLs field is not visible, make sure Site URL is set correctly first!
+
+4. Click **"Save"** after making changes
+
+**⚠️ COMMON MISTAKE**: Site URL should be your base domain WITHOUT any path. If you include `/login` in the Site URL, Supabase won't send confirmation emails and won't show the Redirect URLs field!
 
 ### Step 4: Check if User is in Deleted Users Cache (2 minutes)
 
