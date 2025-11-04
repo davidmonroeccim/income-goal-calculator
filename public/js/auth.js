@@ -35,26 +35,53 @@ class AuthManager {
     startSessionManagement() {
         // First, check for authentication tokens passed via URL hash (for iframe new tab scenarios)
         this.checkUrlAuthentication();
-        
+
         // Check session on page load
         this.validateSession();
 
-        // Set up periodic session checks (every 1 hour - much less aggressive)
+        // Track last activity time for 2-hour inactivity timeout
+        this.lastActivityTime = Date.now();
+        this.inactivityTimeout = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+
+        // Update last activity time on user interaction
+        const updateActivity = () => {
+            this.lastActivityTime = Date.now();
+        };
+
+        // Track various user activities
+        ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(event => {
+            document.addEventListener(event, updateActivity, true);
+        });
+
+        // Check for inactivity timeout every 5 minutes
         this.sessionCheckInterval = setInterval(() => {
-            this.validateSession();
-        }, 60 * 60 * 1000);
+            const inactiveTime = Date.now() - this.lastActivityTime;
+
+            if (inactiveTime >= this.inactivityTimeout) {
+                console.log('Session timed out after 2 hours of inactivity');
+                this.handleLogout();
+            } else {
+                // Only validate session if we're within activity window
+                this.validateSession();
+            }
+        }, 5 * 60 * 1000); // Check every 5 minutes
 
         // Set up token refresh based on expiry
         this.scheduleTokenRefresh();
 
-        // Handle page visibility changes (only validate after 1 hour of inactivity)
+        // Handle page visibility changes (check for inactivity timeout)
         let lastVisibilityChange = Date.now();
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
                 const timeSinceLastCheck = Date.now() - lastVisibilityChange;
-                // Only validate if user was away for more than 1 hour
-                if (timeSinceLastCheck > 60 * 60 * 1000) {
-                    console.log('User returned after 1+ hour, validating session');
+
+                // Check if user was inactive for more than 2 hours
+                if (timeSinceLastCheck >= this.inactivityTimeout) {
+                    console.log('User returned after 2+ hours, session expired');
+                    this.handleLogout();
+                } else {
+                    // Update activity and validate session
+                    this.lastActivityTime = Date.now();
                     this.validateSession();
                 }
                 lastVisibilityChange = Date.now();
@@ -68,6 +95,25 @@ class AuthManager {
                 this.handleLogout(false);
             }
         });
+
+        // Handle window/tab close (don't clear tokens, allow session to persist)
+        window.addEventListener('beforeunload', () => {
+            // Save last activity time to check on next load
+            localStorage.setItem('last_activity_time', this.lastActivityTime.toString());
+        });
+
+        // Check if returning from a previous session
+        const savedActivityTime = localStorage.getItem('last_activity_time');
+        if (savedActivityTime) {
+            const timeSinceLastActivity = Date.now() - parseInt(savedActivityTime);
+            if (timeSinceLastActivity >= this.inactivityTimeout) {
+                console.log('Session expired while window was closed (2+ hours inactive)');
+                this.handleLogout();
+            } else {
+                // Session still valid, update activity time
+                this.lastActivityTime = Date.now();
+            }
+        }
     }
 
     // Check for authentication tokens passed via URL hash (for iframe new tab scenarios)
@@ -457,6 +503,8 @@ class AuthManager {
         if (this.sessionCheckInterval) {
             clearInterval(this.sessionCheckInterval);
         }
+        // Clear last activity time tracking
+        localStorage.removeItem('last_activity_time');
     }
 }
 

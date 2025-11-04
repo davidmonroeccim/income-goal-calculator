@@ -38,16 +38,17 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Stricter rate limiting for auth endpoints
+// Auth rate limiting - Allow 5 login attempts per 15 minutes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 5 : 50, // More lenient for development
+  max: 5, // 5 attempts before timeout
   message: {
-    error: 'Too many authentication attempts, please try again later.',
+    error: 'Too many authentication attempts. Please try again in 15 minutes.',
     code: 'RATE_LIMIT_EXCEEDED'
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skipSuccessfulRequests: true, // Don't count successful logins against the limit
 });
 
 // CORS configuration - Include HighLevel domains for iframe embedding
@@ -97,9 +98,10 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production', // Enable secure cookies for HTTPS in production
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (will timeout after 2 hours of inactivity via client-side logic)
     sameSite: 'strict' // Re-enable strict for better security with HTTPS
-  }
+  },
+  rolling: true // Reset maxAge on every request (extends session on activity)
 }));
 
 // Logging middleware
