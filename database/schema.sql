@@ -35,9 +35,11 @@ CREATE TABLE IF NOT EXISTS user_goals (
 
 -- Daily Activities Table
 -- Tracks daily prospecting activities for paid users
+-- Supports tracking both broker and investor activities separately
 CREATE TABLE IF NOT EXISTS daily_activities (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  user_type VARCHAR(20) NOT NULL DEFAULT 'broker' CHECK (user_type IN ('broker', 'investor')),
   activity_date DATE NOT NULL,
   attempts INTEGER DEFAULT 0 CHECK (attempts >= 0),
   contacts INTEGER DEFAULT 0 CHECK (contacts >= 0),
@@ -47,7 +49,7 @@ CREATE TABLE IF NOT EXISTS daily_activities (
   notes TEXT,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
-  UNIQUE(user_id, activity_date)
+  UNIQUE(user_id, user_type, activity_date)
 );
 
 -- Leads Table
@@ -97,9 +99,11 @@ CREATE TABLE IF NOT EXISTS user_sessions (
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_subscription_status ON users(subscription_status);
 CREATE INDEX IF NOT EXISTS idx_user_goals_user_id ON user_goals(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_goals_user_type ON user_goals(user_id, user_type);
 CREATE INDEX IF NOT EXISTS idx_daily_activities_user_id ON daily_activities(user_id);
 CREATE INDEX IF NOT EXISTS idx_daily_activities_date ON daily_activities(activity_date);
 CREATE INDEX IF NOT EXISTS idx_daily_activities_user_date ON daily_activities(user_id, activity_date);
+CREATE INDEX IF NOT EXISTS idx_daily_activities_user_type_date ON daily_activities(user_id, user_type, activity_date);
 CREATE INDEX IF NOT EXISTS idx_leads_email ON leads(email);
 CREATE INDEX IF NOT EXISTS idx_leads_created_at ON leads(created_at);
 CREATE INDEX IF NOT EXISTS idx_subscription_events_user_id ON subscription_events(user_id);

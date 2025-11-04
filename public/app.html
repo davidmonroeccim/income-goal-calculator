@@ -79,23 +79,46 @@
                             <h2>Your Goals Summary</h2>
                             <p id="goalsStatus">No goals calculated yet. <a href="/calculator">Start calculating</a></p>
                         </div>
-                        
-                        <div id="goalsSummary" class="goals-summary" style="display: none;">
+
+                        <!-- Broker Goals -->
+                        <div id="brokerGoalsSummary" class="goals-summary" style="display: none; margin-bottom: var(--spacing-lg);">
+                            <h3 style="color: var(--secondary-blue); margin-bottom: var(--spacing-md);">🏠 Broker Goals</h3>
                             <div class="goal-item">
                                 <span class="goal-label">Net Commission Goal</span>
-                                <span class="goal-value" id="netCommissionGoal">-</span>
+                                <span class="goal-value" id="brokerNetCommissionGoal">-</span>
                             </div>
                             <div class="goal-item">
                                 <span class="goal-label">Gross Commission Goal</span>
-                                <span class="goal-value" id="grossCommissionGoal">-</span>
+                                <span class="goal-value" id="brokerGrossCommissionGoal">-</span>
                             </div>
                             <div class="goal-item">
                                 <span class="goal-label">Daily Attempts Needed</span>
-                                <span class="goal-value" id="dailyAttemptsGoal">-</span>
+                                <span class="goal-value" id="brokerDailyAttemptsGoal">-</span>
                             </div>
                             <div class="goal-item">
                                 <span class="goal-label">Total Closings Needed</span>
-                                <span class="goal-value" id="closingsNeededGoal">-</span>
+                                <span class="goal-value" id="brokerClosingsNeededGoal">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Investor Goals -->
+                        <div id="investorGoalsSummary" class="goals-summary" style="display: none;">
+                            <h3 style="color: var(--accent-yellow); margin-bottom: var(--spacing-md);">💰 Investor Goals</h3>
+                            <div class="goal-item">
+                                <span class="goal-label">Net Acquisition Fee Goal</span>
+                                <span class="goal-value" id="investorNetAcquisitionFeeGoal">-</span>
+                            </div>
+                            <div class="goal-item">
+                                <span class="goal-label">Gross Acquisition Fee Goal</span>
+                                <span class="goal-value" id="investorGrossAcquisitionFeeGoal">-</span>
+                            </div>
+                            <div class="goal-item">
+                                <span class="goal-label">Daily Attempts Needed</span>
+                                <span class="goal-value" id="investorDailyAttemptsGoal">-</span>
+                            </div>
+                            <div class="goal-item">
+                                <span class="goal-label">Total Closings Needed</span>
+                                <span class="goal-value" id="investorClosingsNeededGoal">-</span>
                             </div>
                         </div>
                     </div>
@@ -232,12 +255,14 @@
             }
         }
 
-        // Load user goals
+        // Load user goals - Load both broker and investor goals
         async function loadUserGoals() {
             if (!currentUser || !window.authManager) return;
 
+            let hasAnyGoals = false;
+
             try {
-                // Try to load broker goals first, then investor goals if broker not found
+                // Load broker goals
                 let response = await window.authManager.makeAuthenticatedRequest('/api/goals/load?type=broker');
 
                 if (response.ok) {
@@ -245,12 +270,12 @@
                     console.log('Broker goals result:', result);
 
                     if (result.goals && result.goals.goal_data) {
-                        displayGoalsSummary(result.goals.goal_data, 'broker');
-                        return;
+                        displayBrokerGoals(result.goals.goal_data);
+                        hasAnyGoals = true;
                     }
                 }
 
-                // If no broker goals, try investor goals
+                // Load investor goals
                 response = await window.authManager.makeAuthenticatedRequest('/api/goals/load?type=investor');
 
                 if (response.ok) {
@@ -258,52 +283,54 @@
                     console.log('Investor goals result:', result);
 
                     if (result.goals && result.goals.goal_data) {
-                        displayGoalsSummary(result.goals.goal_data, 'investor');
-                        return;
+                        displayInvestorGoals(result.goals.goal_data);
+                        hasAnyGoals = true;
                     }
                 }
 
-                console.log('No goals found for user');
+                // Hide status message if we have any goals
+                if (hasAnyGoals) {
+                    document.getElementById('goalsStatus').style.display = 'none';
+                } else {
+                    console.log('No goals found for user');
+                }
 
             } catch (error) {
                 console.error('Load goals error:', error);
             }
         }
 
-        // Display goals summary
-        function displayGoalsSummary(goalData, userType = 'broker') {
-            const goalsStatus = document.getElementById('goalsStatus');
-            const goalsSummary = document.getElementById('goalsSummary');
+        // Display broker goals
+        function displayBrokerGoals(goalData) {
+            const brokerGoalsSummary = document.getElementById('brokerGoalsSummary');
 
-            // Check for broker goals
-            if (userType === 'broker' && goalData && goalData.netCommission) {
-                // Hide status message and show goals
-                goalsStatus.style.display = 'none';
-                goalsSummary.style.display = 'block';
+            if (goalData && goalData.netCommission) {
+                brokerGoalsSummary.style.display = 'block';
 
                 // Update values for broker
-                document.getElementById('netCommissionGoal').textContent = '$' + goalData.netCommission.toLocaleString('en-US');
-                document.getElementById('grossCommissionGoal').textContent = '$' + goalData.grossCommission.toLocaleString('en-US');
-                document.getElementById('dailyAttemptsGoal').textContent = goalData.dailyAttempts;
-                document.getElementById('closingsNeededGoal').textContent = goalData.closingsNeeded;
+                document.getElementById('brokerNetCommissionGoal').textContent = '$' + goalData.netCommission.toLocaleString('en-US');
+                document.getElementById('brokerGrossCommissionGoal').textContent = '$' + goalData.grossCommission.toLocaleString('en-US');
+                document.getElementById('brokerDailyAttemptsGoal').textContent = goalData.dailyAttempts;
+                document.getElementById('brokerClosingsNeededGoal').textContent = goalData.closingsNeeded;
 
                 console.log('Broker goals displayed');
             }
-            // Check for investor goals
-            else if (userType === 'investor' && goalData && goalData.netAcquisitionFee) {
-                // Hide status message and show goals
-                goalsStatus.style.display = 'none';
-                goalsSummary.style.display = 'block';
+        }
 
-                // Update values for investor (using investor terminology)
-                document.getElementById('netCommissionGoal').textContent = '$' + goalData.netAcquisitionFee.toLocaleString('en-US');
-                document.getElementById('grossCommissionGoal').textContent = '$' + goalData.grossAcquisitionFee.toLocaleString('en-US');
-                document.getElementById('dailyAttemptsGoal').textContent = goalData.dailyAttempts;
-                document.getElementById('closingsNeededGoal').textContent = goalData.closingsNeeded;
+        // Display investor goals
+        function displayInvestorGoals(goalData) {
+            const investorGoalsSummary = document.getElementById('investorGoalsSummary');
+
+            if (goalData && goalData.netAcquisitionFee) {
+                investorGoalsSummary.style.display = 'block';
+
+                // Update values for investor
+                document.getElementById('investorNetAcquisitionFeeGoal').textContent = '$' + goalData.netAcquisitionFee.toLocaleString('en-US');
+                document.getElementById('investorGrossAcquisitionFeeGoal').textContent = '$' + goalData.grossAcquisitionFee.toLocaleString('en-US');
+                document.getElementById('investorDailyAttemptsGoal').textContent = goalData.dailyAttempts;
+                document.getElementById('investorClosingsNeededGoal').textContent = goalData.closingsNeeded;
 
                 console.log('Investor goals displayed');
-            } else {
-                console.log('No valid goal data to display');
             }
         }
 
