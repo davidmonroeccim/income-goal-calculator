@@ -310,13 +310,14 @@
                 window.authManager.redirectToLogin();
                 return;
             }
-            
+
             await initializeUser();
             setupEventListeners();
             await loadUserGoals();
             await checkPremiumStatus();
             if (isPremiumUser) {
                 showActivityContent();
+                displayGoalsComparison(); // Display goals and dashboard on initial load
                 await loadRecentActivities();
                 await updateQuickStats();
             }
