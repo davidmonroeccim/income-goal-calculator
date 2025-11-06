@@ -174,6 +174,38 @@
     <section class="pricing-preview" id="pricing">
         <div class="container">
             <h2 class="text-center">Start with Free Calculator. Upgrade When Ready.</h2>
+
+            <!-- Pro Features Video -->
+            <div class="video-section" style="max-width: 800px; margin: 0 auto var(--spacing-xl) auto;">
+                <div class="video-container">
+                    <div class="video-placeholder" id="pricingVideo">
+                        <div class="video-placeholder-content" id="pricingVideoPlaceholderContent">
+                            <div class="play-button">
+                                <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="36" cy="36" r="36" fill="rgba(255, 255, 255, 0.9)"/>
+                                    <path d="M48 36L28 48V24L48 36Z" fill="var(--primary-navy)"/>
+                                </svg>
+                            </div>
+                            <h3>See How Pro Features Help You Stay On Track</h3>
+                            <p>Watch a quick demo of the activity tracking and progress dashboard</p>
+                        </div>
+                        <!-- Vimeo embed code -->
+                        <div id="pricingVimeoEmbed" style="display: none;">
+                            <div style="padding:56.25% 0 0 0;position:relative;">
+                                <iframe id="pricingVimeoIframe"
+                                        src="https://player.vimeo.com/video/1134232270?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1"
+                                        frameborder="0"
+                                        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                                        referrerpolicy="strict-origin-when-cross-origin"
+                                        style="position:absolute;top:0;left:0;width:100%;height:100%;"
+                                        title="Pro Features Demo">
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="pricing-cards">
                 <div class="pricing-card">
                     <h3>Monthly Pro</h3>
@@ -268,52 +300,102 @@
     <script>
         // Video player functionality
         document.addEventListener('DOMContentLoaded', function() {
+            // Hero video
             const videoPlaceholder = document.getElementById('heroVideo');
             const placeholderContent = document.getElementById('videoPlaceholderContent');
             const vimeoEmbed = document.getElementById('vimeoEmbed');
             const vimeoIframe = document.getElementById('vimeoIframe');
-            
+
+            // Pricing video
+            const pricingVideoPlaceholder = document.getElementById('pricingVideo');
+            const pricingPlaceholderContent = document.getElementById('pricingVideoPlaceholderContent');
+            const pricingVimeoEmbed = document.getElementById('pricingVimeoEmbed');
+            const pricingVimeoIframe = document.getElementById('pricingVimeoIframe');
+
             console.log('Video elements found:', {
-                placeholder: !!videoPlaceholder,
-                content: !!placeholderContent,
-                embed: !!vimeoEmbed,
-                iframe: !!vimeoIframe
+                heroPlaceholder: !!videoPlaceholder,
+                heroContent: !!placeholderContent,
+                heroEmbed: !!vimeoEmbed,
+                heroIframe: !!vimeoIframe,
+                pricingPlaceholder: !!pricingVideoPlaceholder,
+                pricingContent: !!pricingPlaceholderContent,
+                pricingEmbed: !!pricingVimeoEmbed,
+                pricingIframe: !!pricingVimeoIframe
             });
-            
-            // Add iframe event listeners
+
+            // Add iframe event listeners for hero video
             if (vimeoIframe) {
                 vimeoIframe.addEventListener('load', function() {
-                    console.log('✅ Vimeo iframe loaded successfully');
+                    console.log('✅ Hero Vimeo iframe loaded successfully');
                 });
-                
+
                 vimeoIframe.addEventListener('error', function() {
-                    console.error('❌ Vimeo iframe failed to load');
+                    console.error('❌ Hero Vimeo iframe failed to load');
                 });
             }
-            
-            // Handle video placeholder click
-            videoPlaceholder.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('🎬 Video placeholder clicked');
-                
-                try {
-                    // Hide placeholder and show video
-                    placeholderContent.style.display = 'none';
-                    vimeoEmbed.style.display = 'block';
-                    
-                    console.log('✅ Video container should now be visible');
-                    
-                    // Add analytics tracking
-                    if (typeof gtag !== 'undefined') {
-                        gtag('event', 'play', {
-                            event_category: 'Video',
-                            event_label: 'Hero Demo Video'
-                        });
+
+            // Add iframe event listeners for pricing video
+            if (pricingVimeoIframe) {
+                pricingVimeoIframe.addEventListener('load', function() {
+                    console.log('✅ Pricing Vimeo iframe loaded successfully');
+                });
+
+                pricingVimeoIframe.addEventListener('error', function() {
+                    console.error('❌ Pricing Vimeo iframe failed to load');
+                });
+            }
+
+            // Handle hero video placeholder click
+            if (videoPlaceholder) {
+                videoPlaceholder.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('🎬 Hero video placeholder clicked');
+
+                    try {
+                        // Hide placeholder and show video
+                        placeholderContent.style.display = 'none';
+                        vimeoEmbed.style.display = 'block';
+
+                        console.log('✅ Hero video container should now be visible');
+
+                        // Add analytics tracking
+                        if (typeof gtag !== 'undefined') {
+                            gtag('event', 'play', {
+                                event_category: 'Video',
+                                event_label: 'Hero Demo Video'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('❌ Error showing hero video:', error);
                     }
-                } catch (error) {
-                    console.error('❌ Error showing video:', error);
-                }
-            });
+                });
+            }
+
+            // Handle pricing video placeholder click
+            if (pricingVideoPlaceholder) {
+                pricingVideoPlaceholder.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('🎬 Pricing video placeholder clicked');
+
+                    try {
+                        // Hide placeholder and show video
+                        pricingPlaceholderContent.style.display = 'none';
+                        pricingVimeoEmbed.style.display = 'block';
+
+                        console.log('✅ Pricing video container should now be visible');
+
+                        // Add analytics tracking
+                        if (typeof gtag !== 'undefined') {
+                            gtag('event', 'play', {
+                                event_category: 'Video',
+                                event_label: 'Pricing Features Demo'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('❌ Error showing pricing video:', error);
+                    }
+                });
+            }
         });
 
         // Stripe Checkout Function
