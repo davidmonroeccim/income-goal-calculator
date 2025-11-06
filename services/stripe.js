@@ -292,20 +292,39 @@ async function handleWebhookEvent(event) {
 
 // Handle successful checkout
 async function handleCheckoutCompleted(session) {
+  console.log('🎯 handleCheckoutCompleted called');
+  console.log('📦 Session data:', JSON.stringify({
+    id: session.id,
+    customer: session.customer,
+    subscription: session.subscription,
+    metadata: session.metadata,
+    customer_email: session.customer_email || session.customer_details?.email
+  }, null, 2));
+
   const userId = session.metadata.userId;
   const planType = session.metadata.planType;
+
+  console.log(`📝 Extracted: userId=${userId}, planType=${planType}`);
+
+  // Skip processing for guest checkouts (handled by registration flow)
+  if (!userId || userId === 'guest') {
+    console.log('⏭️ Skipping guest checkout - will be processed during registration');
+    return;
+  }
 
   // Map plan types to subscription status values
   const statusMapping = {
     'monthly': 'monthly',
-    'yearly': 'annual', 
+    'yearly': 'annual',
     'lifetime': 'lifetime'
   };
 
   const subscriptionStatus = statusMapping[planType] || 'monthly';
+  console.log(`📊 Plan mapping: ${planType} → ${subscriptionStatus}`);
 
   // Record the subscription event
-  await supabase.from('subscription_events').insert({
+  console.log('💾 Inserting subscription event...');
+  const { error: eventError } = await supabase.from('subscription_events').insert({
     user_id: userId,
     stripe_customer_id: session.customer,
     stripe_subscription_id: session.subscription,
@@ -314,40 +333,76 @@ async function handleCheckoutCompleted(session) {
     event_data: session
   });
 
+  if (eventError) {
+    console.error('❌ Failed to insert subscription event:', eventError);
+  } else {
+    console.log('✅ Subscription event recorded');
+  }
+
   // Update user subscription status with correct plan
-  const { data: updatedUser } = await supabase
+  console.log(`🔄 Updating user ${userId} subscription status to ${subscriptionStatus}...`);
+  const { data: updatedUser, error: updateError } = await supabase
     .from('users')
-    .update({ 
+    .update({
       subscription_status: subscriptionStatus,
       stripe_customer_id: session.customer
     })
     .eq('id', userId)
-    .select('email')
+    .select('email, subscription_status')
     .single();
+
+  if (updateError) {
+    console.error('❌ Failed to update user subscription:', updateError);
+    throw updateError;
+  }
+
+  console.log('✅ User updated:', updatedUser);
 
   // Update HighLevel contact with new subscription tag
   if (updatedUser?.email) {
     try {
+      console.log(`🎯 Updating HighLevel contact for ${updatedUser.email} with ${subscriptionStatus} tag...`);
       await trackSubscriptionEvent(updatedUser.email, subscriptionStatus, 'active');
       console.log(`✅ HighLevel contact updated with ${subscriptionStatus} tag for:`, updatedUser.email);
     } catch (highlevelError) {
-      console.error('HighLevel tag update failed during checkout:', highlevelError.message);
+      console.error('❌ HighLevel tag update failed during checkout:', highlevelError.message);
     }
   }
 
-  console.log(`✅ User ${userId} subscription updated: ${planType} -> ${subscriptionStatus}`);
+  console.log(`✅ User ${userId} subscription successfully updated: ${planType} -> ${subscriptionStatus}`);
 }
 
 // Handle subscription created
 async function handleSubscriptionCreated(subscription) {
+  console.log('🎯 handleSubscriptionCreated called');
+  console.log('📦 Subscription data:', JSON.stringify({
+    id: subscription.id,
+    customer: subscription.customer,
+    status: subscription.status,
+    metadata: subscription.metadata
+  }, null, 2));
+
   const userId = subscription.metadata.userId;
-  
-  await supabase.from('subscription_events').insert({
+  console.log(`📝 Extracted: userId=${userId}`);
+
+  if (!userId || userId === 'guest') {
+    console.log('⏭️ Skipping guest subscription - will be processed during registration');
+    return;
+  }
+
+  console.log('💾 Inserting subscription_created event...');
+  const { error } = await supabase.from('subscription_events').insert({
     user_id: userId,
     stripe_subscription_id: subscription.id,
     event_type: 'subscription_created',
     event_data: subscription
   });
+
+  if (error) {
+    console.error('❌ Failed to insert subscription_created event:', error);
+  } else {
+    console.log('✅ Subscription_created event recorded');
+  }
 }
 
 // Handle subscription updated
