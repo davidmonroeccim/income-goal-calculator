@@ -171,22 +171,23 @@ router.post('/billing-portal', requireAuth, async (req, res) => {
   }
 });
 
-// Stripe webhook endpoint with enhanced logging
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+// Webhook handler function (shared by both endpoints)
+async function handleWebhookRequest(req, res) {
   try {
     console.log('🔔 Webhook received at:', new Date().toISOString());
+    console.log('🔔 Path:', req.originalUrl);
     console.log('🔔 Headers:', JSON.stringify(req.headers, null, 2));
     console.log('🔔 Body length:', req.body ? req.body.length : 'no body');
-    
+
     const sig = req.headers['stripe-signature'];
     const { stripe } = require('../services/stripe');
-    
+
     // Skip webhook verification if no secret is configured (for testing)
     if (!process.env.STRIPE_WEBHOOK_SECRET) {
       console.log('⚠️ Webhook secret not configured, skipping verification');
       return res.json({ received: true, message: 'Webhook secret not configured' });
     }
-    
+
     let event;
     try {
       event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
@@ -199,7 +200,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     console.log('🎯 Processing webhook event:', event.type);
     await handleWebhookEvent(event);
     console.log('✅ Webhook processing completed successfully');
-    
+
     res.json({ received: true });
   } catch (error) {
     console.error('❌ Error handling webhook:', error);
@@ -208,7 +209,13 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
       error: 'Webhook handling failed'
     });
   }
-});
+}
+
+// Stripe webhook endpoint - /api/subscriptions/webhook
+router.post('/webhook', express.raw({ type: 'application/json' }), handleWebhookRequest);
+
+// Stripe webhook endpoint alias - /api/webhooks/stripe (for Stripe dashboard configuration)
+router.post('/stripe', express.raw({ type: 'application/json' }), handleWebhookRequest);
 
 // Cancel subscription
 router.post('/cancel', requireAuth, async (req, res) => {

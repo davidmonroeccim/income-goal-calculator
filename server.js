@@ -75,7 +75,7 @@ app.use(compression());
 // Body parsing middleware - Secure limits
 // Exclude Stripe webhook from JSON parsing (needs raw body for signature verification)
 app.use((req, res, next) => {
-  if (req.originalUrl === '/api/subscriptions/webhook') {
+  if (req.originalUrl === '/api/subscriptions/webhook' || req.originalUrl === '/api/webhooks/stripe') {
     next(); // Skip JSON parsing for webhooks
   } else {
     express.json({ limit: '1mb' })(req, res, next);
@@ -142,6 +142,9 @@ app.use('/api/activities', require('./routes/activities'));
 app.use('/api/subscriptions', require('./routes/subscriptions'));
 app.use('/api/highlevel', require('./routes/highlevel'));
 app.use('/api/user', require('./routes/user'));
+
+// Alias route for Stripe webhook (redirect /api/webhooks/stripe to /api/subscriptions/webhook)
+app.use('/api/webhooks', require('./routes/subscriptions'));
 
 // Basic API health check
 app.get('/api/health', (req, res) => {
