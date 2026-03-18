@@ -35,6 +35,16 @@
         gtag('config', 'G-PEQ5C00WVH');
     </script>
 
+    <!-- Intercept Supabase auth redirects (e.g. password reset) that land on root with hash fragment -->
+    <script>
+        (function() {
+            var hash = window.location.hash;
+            if (hash && hash.indexOf('type=recovery') !== -1) {
+                window.location.replace('/reset-password' + hash);
+            }
+        })();
+    </script>
+
     <!-- CSS -->
     <link rel="stylesheet" href="/css/main.css?v=1.1">
     <link rel="stylesheet" href="/css/marketing.css?v=1.1">
